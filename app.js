@@ -162,6 +162,63 @@ const BODYWEIGHT = ['Şınav', 'Barfiks', 'Plank', 'Dips', 'Sandalye Dips', 'Pik
   'Lunge', 'Mekik', 'Bacak Kaldırma', 'Yan Plank'];
 const TIMED = ['Plank', 'Yan Plank'];
 
+/* ---------------- Hareket veri seti (otomatik tamamlama) ---------------- */
+const EXERCISE_DB = [
+  // Göğüs
+  'Bench Press', 'Eğimli Bench Press', 'Ters Eğimli Bench Press', 'Dumbbell Bench Press', 'Eğimli Dumbbell Press',
+  'Ters Eğimli Dumbbell Press', 'Dumbbell Floor Press', 'Dumbbell Fly', 'Eğimli Dumbbell Fly', 'Cable Fly',
+  'Alt Göğüs Cable Fly', 'Üst Göğüs Cable Fly', 'Pec Deck (Butterfly)', 'Chest Press Makinesi', 'Eğimli Chest Press Makinesi',
+  'Smith Machine Bench Press', 'Smith Machine Eğimli Press', 'Dips', 'Şınav', 'Eğimli Şınav', 'Diamond Şınav', 'Dumbbell Pullover',
+  // Sırt
+  'Deadlift', 'Sumo Deadlift', 'Rack Pull', 'Barfiks', 'Chin-up', 'Asistanlı Barfiks', 'Lat Pulldown', 'Dar Tutuş Lat Pulldown',
+  'Ters Tutuş Lat Pulldown', 'Tek Kol Lat Pulldown', 'Straight Arm Pulldown', 'Barbell Row', 'Pendlay Row', 'T-Bar Row',
+  'Seated Cable Row', 'Tek Kol Dumbbell Row', 'Eğilerek Dumbbell Row', 'Chest Supported Row', 'Machine Row', 'Inverted Row',
+  'Hyperextension', 'Good Morning', 'Superman', 'Shrug', 'Dumbbell Shrug',
+  // Omuz
+  'Overhead Press', 'Dumbbell Shoulder Press', 'Arnold Press', 'Shoulder Press Makinesi', 'Smith Machine Shoulder Press',
+  'Lateral Raise', 'Cable Lateral Raise', 'Makine Lateral Raise', 'Front Raise', 'Reverse Fly', 'Reverse Pec Deck',
+  'Face Pull', 'Upright Row', 'Pike Şınav', 'Landmine Press',
+  // Ön kol (biceps)
+  'Barbell Curl', 'EZ Bar Curl', 'Dumbbell Curl', 'Hammer Curl', 'Eğimli Dumbbell Curl', 'Preacher Curl', 'Concentration Curl',
+  'Cable Curl', 'Rope Hammer Curl', 'Spider Curl', 'Bayesian Curl', 'Reverse Curl', 'Wrist Curl',
+  // Arka kol (triceps)
+  'Triceps Pushdown', 'Rope Pushdown', 'Overhead Triceps Extension', 'Cable Overhead Extension', 'Skull Crusher',
+  'Close Grip Bench Press', 'Triceps Kickback', 'Sandalye Dips', 'Bench Dips', 'Tek Kol Pushdown',
+  // Bacak
+  'Squat', 'Front Squat', 'Goblet Squat', 'Sumo Goblet Squat', 'Hack Squat', 'Smith Machine Squat', 'Leg Press',
+  'Bulgarian Split Squat', 'Lunge', 'Walking Lunge', 'Reverse Lunge', 'Step-up', 'Romanian Deadlift', 'Dumbbell RDL',
+  'Stiff Leg Deadlift', 'Leg Extension', 'Leg Curl', 'Seated Leg Curl', 'Lying Leg Curl', 'Nordic Curl',
+  'Hip Thrust', 'Glute Bridge', 'Tek Bacak Glute Bridge', 'Cable Kickback', 'Hip Abduction Makinesi', 'Hip Adduction Makinesi',
+  'Calf Raise', 'Seated Calf Raise', 'Leg Press Calf Raise', 'Pistol Squat', 'Wall Sit',
+  // Karın / core
+  'Plank', 'Yan Plank', 'Mekik', 'Crunch', 'Cable Crunch', 'Bacak Kaldırma', 'Asılı Bacak Kaldırma', 'Russian Twist',
+  'Ab Wheel', 'Mountain Climber', 'Dead Bug', 'Bicycle Crunch', 'Pallof Press', 'Woodchopper',
+  // Tüm vücut / kardiyo
+  'Kettlebell Swing', 'Clean and Press', 'Power Clean', 'Thruster', 'Burpee', 'Farmer Walk', 'Box Jump', 'İp Atlama',
+  'Koşu Bandı', 'Bisiklet', 'Eliptik', 'Kürek Makinesi', 'Merdiven Makinesi'
+];
+// Arama için sadeleştir: küçük harf, Türkçe karakterler → Latin, boşluk ve tireler yok
+const normalize = s => s.toLocaleLowerCase('tr')
+  .replace(/[çğıöşüâî]/g, c => ({ ç: 'c', ğ: 'g', ı: 'i', ö: 'o', ş: 's', ü: 'u', â: 'a', î: 'i' }[c]))
+  .replace(/[\s\-()]/g, '');
+const EXERCISE_INDEX = EXERCISE_DB.map(name => ({ name, n: normalize(name), words: name.split(/[\s\-()]+/).map(normalize) }));
+
+// Önce adı sorguyla başlayanlar, sonra bir kelimesi sorguyla başlayanlar, sonra adında geçenler
+function searchExercises(q, limit) {
+  const nq = normalize(q || '');
+  if (!nq) return [];
+  const scored = [];
+  EXERCISE_INDEX.forEach(e => {
+    let s = -1;
+    if (e.n.startsWith(nq)) s = 0;
+    else if (e.words.some(w => w.startsWith(nq))) s = 1;
+    else if (e.n.indexOf(nq) >= 0) s = 2;
+    if (s >= 0) scored.push([s, e.name]);
+  });
+  scored.sort((a, b) => a[0] - b[0] || a[1].length - b[1].length || a[1].localeCompare(b[1], 'tr'));
+  return scored.slice(0, limit || 8).map(x => x[1]);
+}
+
 const TEMPLATES = {
   gym: {
     fbA: ['Tüm Vücut A', ['Squat', 'Bench Press', 'Barbell Row', 'Overhead Press', 'Leg Curl', 'Triceps Pushdown', 'Plank']],
@@ -771,7 +828,8 @@ function vNewProgram() {
       body += '<input type="text" data-bind="np-title" data-d="' + i + '" value="' + h(d.title) + '" placeholder="Gün adı (örn. Göğüs & Arka Kol)" style="margin-top:12px">';
       d.exercises.forEach((e, j) => {
         const a = ' data-d="' + i + '" data-j="' + j + '"';
-        body += '<div class="b-ex"><input type="text" data-bind="np-ex-name"' + a + ' value="' + h(e.name) + '" placeholder="Hareket adı">' +
+        body += '<div class="b-ex"><div class="name-wrap"><input type="text" data-bind="np-ex-name"' + a + ' value="' + h(e.name) + '" placeholder="Hareket adı (örn. lat)" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">' +
+          '<span class="clr" data-act="np-clear"' + a + '>×</span></div><div class="sugg"></div>' +
           '<div class="row"><div><label>Set</label><input type="text" inputmode="numeric" pattern="[0-9]*" data-bind="np-ex-sets"' + a + ' value="' + h(e.sets) + '"></div>' +
           '<div><label>Hedef tekrar</label><input type="text" data-bind="np-ex-reps"' + a + ' value="' + h(e.reps) + '" placeholder="8-12"></div>' +
           '<div><label>Başl. kg</label><input type="text" inputmode="decimal" data-bind="np-ex-w"' + a + ' value="' + h(e.startWeight) + '" placeholder="—"></div>' +
@@ -803,7 +861,7 @@ function saveNewProgram() {
     for (const e of exs) {
       const sets = parseInt(e.sets, 10);
       if (!(sets >= 1 && sets <= 10)) return err(DAY_NAMES[i] + ' · ' + e.name + ': set sayısı 1-10 arası olmalı.');
-      out.push({ id: uid(), name: e.name.trim(), sets, reps: e.reps.trim(), startWeight: num(e.startWeight), bw: false });
+      out.push({ id: uid(), name: e.name.trim(), sets, reps: e.reps.trim(), startWeight: num(e.startWeight), bw: BODYWEIGHT.indexOf(e.name.trim()) >= 0 });
     }
     days.push({ off: false, title: d.title.trim() || DAY_NAMES[i] + ' Antrenmanı', exercises: out });
   }
@@ -941,6 +999,24 @@ document.addEventListener('click', e => {
       S.drafts.np.days[+ds.d].exercises.splice(+ds.j, 1);
       save(); rerender();
       break;
+    case 'np-pick': {
+      const ex = S.drafts.np.days[+ds.d].exercises[+ds.j];
+      ex.name = ds.name;
+      const input = el.closest('.b-ex').querySelector('[data-bind=np-ex-name]');
+      input.value = ds.name;
+      hideSuggestions();
+      save();
+      break;
+    }
+    case 'np-clear': {
+      S.drafts.np.days[+ds.d].exercises[+ds.j].name = '';
+      const input = el.closest('.b-ex').querySelector('[data-bind=np-ex-name]');
+      input.value = '';
+      hideSuggestions();
+      input.focus();
+      save();
+      break;
+    }
     case 'np-save':
       saveNewProgram();
       break;
@@ -1014,6 +1090,32 @@ document.addEventListener('click', e => {
   }
 });
 
+/* ---------------- Hareket adı önerileri ---------------- */
+function hideSuggestions() {
+  document.querySelectorAll('.sugg').forEach(s => { s.innerHTML = ''; });
+}
+function showSuggestions(input) {
+  hideSuggestions();
+  const box = input.closest('.b-ex').querySelector('.sugg');
+  const q = input.value.trim();
+  const list = searchExercises(q, 8).filter(n => n !== q); // tam eşleşme zaten seçili
+  if (!list.length) return;
+  box.innerHTML = list.map(n => {
+    // Yazılan kısım adda birebir geçiyorsa kalın göster
+    const i = n.toLocaleLowerCase('tr').indexOf(q.toLocaleLowerCase('tr'));
+    const label = i >= 0 ? h(n.slice(0, i)) + '<b>' + h(n.slice(i, i + q.length)) + '</b>' + h(n.slice(i + q.length)) : h(n);
+    return '<div class="sg" data-act="np-pick" data-d="' + input.dataset.d + '" data-j="' + input.dataset.j + '" data-name="' + h(n) + '">' + label + '</div>';
+  }).join('');
+}
+// Başka bir alana geçilince ya da boş bir yere dokununca öneriler kapanır
+document.addEventListener('focusin', e => {
+  if (e.target.dataset && e.target.dataset.bind === 'np-ex-name') { if (e.target.value.trim()) showSuggestions(e.target); }
+  else hideSuggestions();
+});
+document.addEventListener('click', e => {
+  if (!e.target.closest('.sugg') && !e.target.closest('.name-wrap')) hideSuggestions();
+}, true);
+
 // Metin alanları: yazarken taslağa kaydet (sayfayı yeniden çizmeden)
 document.addEventListener('input', e => {
   const el = e.target;
@@ -1038,7 +1140,7 @@ document.addEventListener('input', e => {
   else if (b === 'np-title') np.days[+ds.d].title = el.value;
   else {
     const ex = np.days[+ds.d].exercises[+ds.j];
-    if (b === 'np-ex-name') ex.name = el.value;
+    if (b === 'np-ex-name') { ex.name = el.value; showSuggestions(el); }
     else if (b === 'np-ex-sets') ex.sets = el.value;
     else if (b === 'np-ex-reps') ex.reps = el.value;
     else if (b === 'np-ex-w') ex.startWeight = el.value;

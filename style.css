@@ -237,6 +237,16 @@ h1, h2, h3 { margin: 0; }
 .mini-seg div.on.offon { background: var(--off); }
 .b-ex { background: var(--card2); border-radius: 12px; padding: 10px; margin-top: 10px; }
 .b-ex input { background: var(--bg); padding: 10px 12px; }
+.name-wrap { position: relative; }
+.name-wrap input { padding-right: 40px; }
+.name-wrap .clr { position: absolute; right: 8px; top: 50%; transform: translateY(-50%); width: 24px; height: 24px; border-radius: 50%; background: var(--line); color: var(--text); font-size: 16px; line-height: 24px; text-align: center; }
+.name-wrap input:placeholder-shown + .clr { display: none; }
+.sugg:empty { display: none; }
+.sugg { margin-top: 6px; background: var(--bg); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
+.sugg .sg { padding: 12px 14px; font-size: 15px; border-top: 1px solid var(--line); color: var(--muted); }
+.sugg .sg:first-child { border-top: 0; }
+.sugg .sg b { color: var(--text); font-weight: 700; }
+.sugg .sg:active { background: var(--card2); }
 .b-ex .row { margin-top: 8px; gap: 8px; align-items: flex-end; }
 .b-ex .row > div { flex: 1; min-width: 0; }
 .b-ex .row label { display: block; font-size: 11px; color: var(--muted); margin-bottom: 4px; }

@@ -45,6 +45,7 @@ Kurulumdan sonra kullanıcıya program önerir; kullanıcı ister kullanır, ist
 
 ### 3. Kendi programını oluşturma
 Program adı; her gün için "Antrenman" ya da "Off Day"; hareket adı, set, hedef tekrar ve başlangıç ağırlığı.
+- **Hareket adı otomatik tamamlama:** Uygulamanın içinde ~150 hareketlik bir liste (`EXERCISE_DB`, app.js) var. Yazmaya başlayınca adında o metin geçen en fazla 8 öneri çıkıyor (ör. "lat" → Lat Pulldown, Lateral Raise...). Arama Türkçe karakter ve boşluk duyarsız ("sinav" → Şınav, "pull down" → Lat Pulldown). Sıralama: adı yazılanla başlayanlar → bir kelimesi yazılanla başlayanlar → adında geçenler; aynı grupta kısa adlar önce. Seçilen ad × ile silinebiliyor. Listede olmayan bir ad da serbestçe yazılabiliyor.
 - **Programlar oluşturulduktan sonra düzenlenemez.** Değişiklik için yeni program oluşturulur. Düzenleme mantığına henüz karar verilmedi.
 
 ### 4. Ana sayfa
