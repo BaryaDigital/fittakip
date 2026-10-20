@@ -6,7 +6,8 @@
    ========================================================= */
 
 const STORE_KEY = 'fittakip.v1';
-const INCREMENT = 2.5;
+// Eski kayıtlarda artış evet/hayır olarak tutuluyordu (sabit 2,5 kg); yenilerde kg miktarı
+const incOf = e => (typeof e.increase === 'number' ? e.increase : (e.increase ? 2.5 : 0));
 
 const DAY_NAMES = ['Pazartesi', 'Salı', 'Çarşamba', 'Perşembe', 'Cuma', 'Cumartesi', 'Pazar'];
 const DAY_SHORT = ['Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt', 'Paz'];
@@ -127,7 +128,8 @@ function plannedWeight(p, date, ex) {
   if (prev) {
     const e = prev.exercises.find(x => x.exId === ex.id);
     if (e && e.weight != null) {
-      return { kind: 'planned', value: Math.round((e.weight + (e.increase ? INCREMENT : 0)) * 100) / 100, increased: !!e.increase };
+      const inc = incOf(e);
+      return { kind: 'planned', value: Math.round((e.weight + inc) * 100) / 100, inc };
     }
   }
   if (ex.startWeight != null) return { kind: 'planned', value: ex.startWeight };
@@ -137,7 +139,7 @@ function plannedWeight(p, date, ex) {
 function weightHtml(pw, ex) {
   if (pw.kind === 'undetermined') return '<span class="wtext pending">Ağırlık durumu henüz belirlenmedi</span>';
   if (pw.value == null) return '<span class="wtext pending">' + (ex.bw ? 'Vücut ağırlığı' : 'Belirlenmedi') + '</span>';
-  return '<span class="wtext">' + fmtKg(pw.value) + ' kg</span>' + (pw.increased ? ' <span class="up">↑ +' + fmtKg(INCREMENT) + '</span>' : '');
+  return '<span class="wtext">' + fmtKg(pw.value) + ' kg</span>' + (pw.inc ? ' <span class="up">↑ +' + fmtKg(pw.inc) + '</span>' : '');
 }
 
 function dayStatus(p, date) {
@@ -602,7 +604,7 @@ function vDay(date) {
       const reps = dr.r[ex.id] || [];
       body += '<div class="card ex"><div class="ex-name">' + h(ex.name) + '</div>' +
         '<div class="ex-target">' + ex.sets + ' set' + (ex.reps ? ' · Hedef ' + h(ex.reps) : '') + '</div>' +
-        '<div class="wline"><span class="lbl">Ağırlık (kg)' + (pw.increased ? ' <span class="up">↑ +' + fmtKg(INCREMENT) + '</span>' : '') + '</span>' +
+        '<div class="wline"><span class="lbl">Ağırlık (kg)' + (pw.inc ? ' <span class="up">↑ +' + fmtKg(pw.inc) + '</span>' : '') + '</span>' +
         '<input type="text" inputmode="decimal" data-w="' + ex.id + '" value="' + h(wVal) + '" placeholder="' + (ex.bw ? 'VA' : 'kg') + '"></div>' +
         '<div class="sets">';
       for (let i = 0; i < ex.sets; i++) {
@@ -644,7 +646,7 @@ function logBody(log, p) {
       const r = e.reps[i];
       body += '<div class="set-row"><span class="sn">Set ' + (i + 1) + '</span><div class="box' + (r != null ? ' val' : '') + '">' + (r != null ? r + ' tekrar' : 'yapılmadı') + '</div></div>';
     }
-    body += '</div>' + (e.increase ? '<div class="up" style="margin-top:8px">↑ Sonraki hafta ' + fmtKg(e.weight + INCREMENT) + ' kg</div>' : '') + '</div>';
+    body += '</div>' + (incOf(e) ? '<div class="up" style="margin-top:8px">↑ +' + fmtKg(incOf(e)) + ' kg · sonraki hafta ' + fmtKg(e.weight + incOf(e)) + ' kg</div>' : '') + '</div>';
   });
   return body;
 }
@@ -662,7 +664,7 @@ function completeWorkout(date) {
     }
     // Kullanıcı ağırlık alanına dokunmadıysa planlanan ağırlık geçerlidir
     const w = dr.w[ex.id] != null ? num(dr.w[ex.id]) : plannedWeight(p, date, ex).value;
-    return { exId: ex.id, name: ex.name, sets: ex.sets, target: ex.reps || '', bw: !!ex.bw, weight: w == null ? null : w, reps, increase: false };
+    return { exId: ex.id, name: ex.name, sets: ex.sets, target: ex.reps || '', bw: !!ex.bw, weight: w == null ? null : w, reps, increase: 0 };
   });
   if (!exercises.some(e => e.reps.some(r => r != null))) {
     const err = document.getElementById('day-err');
@@ -676,13 +678,18 @@ function completeWorkout(date) {
 let modalCtx = null;
 
 function openProgressionModal(p, date, day, exercises) {
-  modalCtx = { p, date, day, exercises, sel: {} };
+  modalCtx = { p, date, day, exercises, sel: {}, amt: {} };
   drawModal();
 }
-function drawModal() {
+// Artış miktarı geçerliyse yeni ağırlığı, değilse ipucunu gösterir
+function incPreview(e) {
+  const a = num(modalCtx.amt[e.exId]);
+  return a > 0 ? '→ <b>' + fmtKg(e.weight + a) + ' kg</b>' : 'Miktarı yaz';
+}
+function drawModal(focusId) {
   const c = modalCtx;
   let html = '<div class="modal-bg" data-act="modal-bg"><div class="modal">' +
-    '<h3>Harika iş! 💪</h3><p>Hangi hareketlerde ağırlığı artırmaya hazırsın? Seçtiklerin gelecek hafta <b>+' + fmtKg(INCREMENT) + ' kg</b> ile görünecek.</p>';
+    '<h3>Harika iş! 💪</h3><p>Hangi hareketlerde ağırlığı artırmaya hazırsın? Seçtiğin hareketlere kaç kg ekleyeceğini yaz; gelecek hafta aynı gün bu ağırlıkla görünecek.</p>';
   const selectable = c.exercises.filter(e => e.weight != null);
   if (selectable.length) {
     const all = selectable.every(e => c.sel[e.exId]);
@@ -691,15 +698,23 @@ function drawModal() {
   c.exercises.forEach(e => {
     const dis = e.weight == null;
     const sel = !!c.sel[e.exId];
-    html += '<div class="pick' + (sel ? ' sel' : '') + (dis ? ' dis' : '') + '"' + (dis ? '' : ' data-act="pick" data-id="' + e.exId + '"') + '>' +
+    html += '<div class="pick-wrap' + (sel ? ' sel' : '') + '"><div class="pick' + (sel ? ' sel' : '') + (dis ? ' dis' : '') + '"' + (dis ? '' : ' data-act="pick" data-id="' + e.exId + '"') + '>' +
       '<div class="bx">' + (sel ? '✓' : '') + '</div><div class="mid"><div class="nm">' + h(e.name) + '</div>' +
-      '<div class="w">' + (dis ? 'Ağırlık girilmedi' : fmtKg(e.weight) + ' kg' + (sel ? ' → <b>' + fmtKg(e.weight + INCREMENT) + ' kg</b>' : '')) + '</div></div></div>';
+      '<div class="w">' + (dis ? 'Ağırlık girilmedi' : 'Bu hafta ' + fmtKg(e.weight) + ' kg') + '</div></div></div>';
+    if (sel) {
+      html += '<div class="inc-row"><span class="lbl">Kaç kg artıracaksın?</span>' +
+        '<div class="unit-input"><input type="text" inputmode="decimal" data-inc="' + e.exId + '" value="' + h(c.amt[e.exId] || '') + '"><span>kg</span></div>' +
+        '<span class="inc-prev" data-prev="' + e.exId + '">' + incPreview(e) + '</span></div>';
+    }
+    html += '</div>';
   });
-  html += '<button class="btn" data-act="save-workout" style="margin-top:14px">Kaydet ve Tamamla</button>' +
+  html += '<div class="err" id="modal-err"></div>' +
+    '<button class="btn" data-act="save-workout" style="margin-top:14px">Kaydet ve Tamamla</button>' +
     '<button class="btn secondary" data-act="modal-close">Geri dön</button></div></div>';
   let el = document.getElementById('modal');
   if (!el) { el = document.createElement('div'); el.id = 'modal'; document.body.appendChild(el); }
   el.innerHTML = html;
+  if (focusId) { const inp = el.querySelector('[data-inc="' + focusId + '"]'); if (inp) inp.focus(); }
 }
 function closeModal() {
   const el = document.getElementById('modal');
@@ -708,7 +723,15 @@ function closeModal() {
 }
 function saveWorkout() {
   const c = modalCtx;
-  c.exercises.forEach(e => { e.increase = !!c.sel[e.exId] && e.weight != null; });
+  // Seçilen her hareket için geçerli bir artış miktarı yazılmış olmalı
+  const missing = c.exercises.filter(e => c.sel[e.exId] && e.weight != null && !(num(c.amt[e.exId]) > 0 && num(c.amt[e.exId]) <= 100));
+  if (missing.length) {
+    document.getElementById('modal-err').textContent = 'Şu hareketler için artış miktarını yaz (0-100 kg arası): ' + missing.map(e => e.name).join(', ');
+    const inp = document.querySelector('[data-inc="' + missing[0].exId + '"]');
+    if (inp) inp.focus();
+    return;
+  }
+  c.exercises.forEach(e => { e.increase = c.sel[e.exId] && e.weight != null ? num(c.amt[e.exId]) : 0; });
   S.logs.push({
     id: uid(), programId: c.p.id, date: c.date, dayIndex: dayIdx(c.date), title: c.day.title,
     completedAt: new Date().toISOString(), exercises: c.exercises
@@ -1030,7 +1053,7 @@ document.addEventListener('click', e => {
       break;
     case 'pick':
       modalCtx.sel[ds.id] = !modalCtx.sel[ds.id];
-      drawModal();
+      drawModal(modalCtx.sel[ds.id] ? ds.id : null); // yeni seçilenin miktar alanına odaklan
       break;
     case 'pick-all': {
       const sel = modalCtx.exercises.filter(x => x.weight != null);
@@ -1120,6 +1143,12 @@ document.addEventListener('click', e => {
 document.addEventListener('input', e => {
   const el = e.target;
   const ds = el.dataset;
+  if (ds.inc && modalCtx) {
+    modalCtx.amt[ds.inc] = el.value;
+    const ex = modalCtx.exercises.find(x => x.exId === ds.inc);
+    document.querySelector('[data-prev="' + ds.inc + '"]').innerHTML = incPreview(ex);
+    return;
+  }
   if (ds.w || ds.r) {
     const p = activeProgram();
     const date = location.hash.split('/')[2];

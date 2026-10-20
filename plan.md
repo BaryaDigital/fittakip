@@ -55,7 +55,8 @@ Program adı; her gün için "Antrenman" ya da "Off Day"; hareket adı, set, hed
 ### 5. Antrenman girişi
 - Tekrar alanları her zaman boş gelir; kullanıcı yaptığı tekrarları yazar.
 - Ağırlık önceki haftadan hesaplanıp önceden doldurulur.
-- **Tamamla** → "Hangi hareketlerde ağırlığı artırmaya hazırsın?" (bir, birkaç ya da hepsi). Seçilenler **gelecek haftanın aynı gününde +2,5 kg** görünür.
+- **Tamamla** → "Hangi hareketlerde ağırlığı artırmaya hazırsın?" (bir, birkaç ya da hepsi). Seçilen her hareket için **kaç kg artırılacağı kullanıcı tarafından yazılır**; varsayılan değer yok, seçilip miktarı yazılmayan hareket varsa kayıt engellenir. Her hareket kendi miktarıyla **gelecek haftanın aynı gününe** yansır; seçilmeyenler aynı ağırlıkta kalır.
+  - Kayıtta `increase` alanı kg sayısıdır. Eski kayıtlarda `true` olanlar 2,5 kg olarak okunur (`incOf`).
 
 ### 6. Haftalık görünüm
 - **Bu hafta / Gelecek hafta** sekmeleri var.

@@ -3,10 +3,10 @@
 > Projeye geri dönüldüğünde önce bu dosya okunur. Her çalışma oturumunun sonunda güncellenir (en yeni kayıt en üstte).
 
 ## Şu anki durum (20 Ekim 2026)
-- **Sürüm:** v3 (`sw.js` → `VERSION = 'fittakip-v3'`)
+- **Sürüm:** v4 (`sw.js` → `VERSION = 'fittakip-v4'`)
 - **Depo:** https://github.com/lByRootl/fittakip (`main` dalı)
 - **Durum:** Uygulama çalışır durumda. Planlanan tüm temel işlevler bitti (bkz. `plan.md`).
-- **Kaldığımız yer:** Uygulama GitHub Pages'te yayında (https://lbyrootl.github.io/fittakip/) ve kullanıcının telefonunda kurulu. En son hareket adı otomatik tamamlama eklendi.
+- **Kaldığımız yer:** Uygulama GitHub Pages'te yayında (https://lbyrootl.github.io/fittakip/) ve kullanıcının telefonunda kurulu. En son ağırlık artırma sorusu, hareket başına kg miktarı yazılacak şekilde değiştirildi.
 
 ## Sıradaki adımlar
 1. [x] Depo public yapıldı, GitHub Pages açıldı, telefona kuruldu
@@ -25,6 +25,7 @@
 - Depo public yapıldı (ücretsiz Pages için gerekli); uygulama yayında ve telefona kuruldu.
 - Kullanıcı isteğiyle eklendi: program oluştururken **hareket adı otomatik tamamlama**. ~150 hareketlik dahili liste, Türkçe karakter ve boşluk duyarsız arama, seçimi silmek için × butonu. Sürüm v3.
 - Otomatik test sayısı 52'ye çıktı, hepsi geçiyor.
+- Kullanıcı isteğiyle değişti: ağırlık artırma sorusunda **sabit 2,5 kg kaldırıldı**. Seçilen her hareket için artış miktarı kg olarak yazılıyor ve gelecek haftanın aynı gününe yansıyor. Eski kayıtlar 2,5 kg olarak okunmaya devam ediyor. Sürüm v4, 55 test geçiyor.
 
 ### Oturum 1 (20 Ekim 2026)
 - Platform kararı alındı: Windows + iPhone 15 olduğu için PWA (native için Mac/Xcode gerekiyor).
