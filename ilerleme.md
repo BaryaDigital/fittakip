@@ -6,12 +6,14 @@
 - **Sürüm:** v7 (`sw.js` → `VERSION = 'fittakip-v7'`)
 - **Depo:** https://github.com/lByRootl/fittakip (`main` dalı)
 - **Durum:** Uygulama çalışır durumda. Planlanan tüm temel işlevler bitti (bkz. `plan.md`).
-- **Kaldığımız yer:** Uygulama GitHub Pages'te yayında (https://lbyrootl.github.io/fittakip/) ve kullanıcının telefonunda kurulu. En son antrenman günü ağırlık ve set sayısını değiştirme eklendi (tamamlanınca kilitlenir).
+- **Kaldığımız yer:** Uygulama GitHub Pages'te yayında (https://lbyrootl.github.io/fittakip/) ve kullanıcının telefonunda kurulu. Kullanıcı tüm özellikleri telefonda denedi ve çalışıyor. **Projeye mola verildi**; her şey GitHub'a gönderildi ve yayındaki site v7. Son eklenen: antrenman günü ağırlık ve set sayısını değiştirme, `FitTakip_Islevler.txt`'nin depoya alınması.
 
 ## Sıradaki adımlar
 1. [x] Depo public yapıldı, GitHub Pages açıldı, telefona kuruldu
-2. [ ] Gerçek kullanımda gelen geri bildirimlere göre düzeltmeler
-3. [ ] Karar bekleyenler: program düzenleme mantığı, grafikler, gerçek yapay zeka entegrasyonu
+2. [ ] Android'de deneme (başka bir kişinin telefonu; henüz denenmedi)
+3. [ ] Kullanıcının "daha sonra gördüğüm eksikler" listesi: yeni oturumda kullanıcıya sorulacak
+4. [ ] Gerçek kullanımda gelen geri bildirimlere göre düzeltmeler
+5. [ ] Karar bekleyenler: program düzenleme mantığı, grafikler, gerçek yapay zeka entegrasyonu
 
 ## Güncelleme yaparken dikkat
 - Kod değişince `sw.js` içindeki `VERSION` artırılmalı; yoksa telefon eski önbelleği kullanmaya devam eder.

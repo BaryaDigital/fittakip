@@ -3,11 +3,14 @@
 Kişisel fitness takip uygulaması. Bir PWA (web uygulaması) olarak yazıldı: iPhone'da Safari'den "Ana Ekrana Ekle" ile kuruluyor, tam ekran ve internetsiz çalışıyor. Tüm veriler telefonda (localStorage) saklanıyor.
 
 ## Dosyalar
+- `plan.md`: projenin ne olduğu, yapısı ve tüm işlevler
+- `ilerleme.md`: kaldığımız yer ve oturum geçmişi
+- `FitTakip_Islevler.txt`: işlevlerin kısa, madde madde anlatımı
 - `index.html`: giriş sayfası
 - `style.css`: tasarım
 - `app.js`: uygulamanın tamamı (veri, program oluşturucu, ekranlar)
 - `sw.js`: çevrimdışı çalışma (service worker). **Dosyaları her güncellediğinde `VERSION` değerini artır.**
-- `manifest.webmanifest`, `icon-*.png`: ana ekran ikonu ve ayarları
+- `manifest.webmanifest`, `icon-*.png`: ana ekran ikonu ve ayarları (`icon-maskable-*` Android için)
 
 ## Bilgisayarda deneme
 ```
