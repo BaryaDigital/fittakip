@@ -27,7 +27,7 @@
 - Otomatik test sayısı 52'ye çıktı, hepsi geçiyor.
 - Kullanıcı isteğiyle değişti: ağırlık artırma sorusunda **sabit 2,5 kg kaldırıldı**. Seçilen her hareket için artış miktarı kg olarak yazılıyor ve gelecek haftanın aynı gününe yansıyor. Eski kayıtlar 2,5 kg olarak okunmaya devam ediyor. Sürüm v4, 55 test geçiyor.
 - Uygulamanın Android'de de (başka bir kişi, başka ağ) aynı adresten kurulabileceği konuşuldu. Android için **maskable ikonlar** eklendi. Sürüm v5. Gerçek Android cihazda henüz test edilmedi.
-- Tüm işlevleri anlatan `FitTakip_Islevler.txt` oluşturuldu. **Kullanıcı isteğiyle GitHub'a gönderilmiyor**; `.git/info/exclude` ile yok sayılıyor. Yeni işlev eklenince bu dosya da güncellenmeli.
+- Tüm işlevleri anlatan `FitTakip_Islevler.txt` oluşturuldu. Önce yerel tutuldu, sonra kullanıcı kararını değiştirdi ve **artık depoda**. Yeni işlev eklenince bu dosya da güncellenmeli.
 - Kullanıcı isteğiyle eklendi: **birleşik set**. Program oluştururken hareketler birleştirilebiliyor; gruptaki hareketlerin set sayısı aynı olmalı. Ağırlık artırma sorusu birleşik setteki her hareket için ayrı soruluyor. Sürüm v6, 70 test geçiyor.
 - Kullanıcı isteğiyle eklendi: antrenman sırasında **ağırlık ve set sayısı plandan farklı girilebiliyor** (− / + ile set). "Tamamla"dan sonra kilitleniyor. Geçmişte plandan farklı olanlar "Plan: … idi" diye görünüyor; gelecek hafta gerçekte yapılan ağırlıktan hesaplanıyor. Sürüm v7, 80 test geçiyor.
 

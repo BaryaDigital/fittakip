@@ -19,6 +19,7 @@ Derleme adımı ya da kütüphane yok; düz HTML/CSS/JavaScript.
 | `style.css` | Tüm tasarım (koyu tema, mobil öncelikli) |
 | `app.js` | Uygulamanın tamamı: veri katmanı, program oluşturucu, ekranlar, olaylar |
 | `sw.js` | Service worker (çevrimdışı önbellek). **Her güncellemede `VERSION` artırılmalı.** |
+| `FitTakip_Islevler.txt` | Tüm işlevlerin kısa, madde madde anlatımı (yeni işlevde güncellenmeli) |
 | `manifest.webmanifest` | Ana ekran uygulaması ayarları |
 | `icon-180/192/512.png` | Uygulama ikonları (iPhone ve genel) |
 | `icon-maskable-192/512.png` | Android ikonları: dambıl %80 küçük, başlatıcı daire/şekil kesse de kırpılmaz |

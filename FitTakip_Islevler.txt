@@ -1,0 +1,133 @@
+FITTAKIP - UYGULAMA İŞLEVLERİ
+==============================
+
+FitTakip, telefonda çalışan kişisel bir fitness takip uygulamasıdır.
+Adres: https://lbyrootl.github.io/fittakip/
+Kurulum: iPhone'da Safari > Paylaş > "Ana Ekrana Ekle". Android'de Chrome > ⋮ > "Uygulamayı yükle".
+İnternetsiz çalışır. Tüm veriler sadece kullanılan telefonda saklanır.
+
+
+1. İLK KURULUM (5 ADIM)
+-----------------------
+- Adım 1: Ad, soyad, boy (cm), kilo (kg)
+- Adım 2: Hedef kilo
+- Adım 3: Amaç: Kilo vermek / Kas kazanmak / Güçlenmek / Formda kalmak
+- Adım 4: Haftada kaç gün (2-6) ve nerede (spor salonu / ev)
+- Adım 5: Fitness geçmişi: Başlangıç / Orta / İleri / Uzman
+
+
+2. AI PROGRAM ÖNERİSİ
+---------------------
+- Kurulumdan sonra verilen bilgilere göre otomatik bir haftalık program hazırlanır.
+- Gün sayısı programın bölünüşünü belirler: tüm vücut, itiş/çekiş/bacak, üst/alt vücut.
+- Seviye hareket ve set sayısını, amaç hedef tekrar aralığını belirler.
+- Salon ve ev için ayrı hareketler kullanılır.
+- Programa ad verilebilir. Kullanıcı ister bu programı kullanır, ister kendi programını oluşturur.
+- Not: Öneriler kurallara göre hazırlanır, gerçek bir yapay zeka kullanılmaz.
+
+
+3. KENDİ PROGRAMINI OLUŞTURMA
+-----------------------------
+- Programa bir ad verilir.
+- Haftanın her günü "Antrenman" ya da "Off Day" olarak seçilir.
+- Antrenman günlerine gün adı (örn. Göğüs & Arka Kol) ve hareketler eklenir.
+- Her hareket için: ad, set sayısı, hedef tekrar (isteğe bağlı), başlangıç ağırlığı (isteğe bağlı).
+- Hareket adı otomatik tamamlama:
+  * Yazmaya başlayınca adında o metin geçen hareketler önerilir (örn. "lat" > Lat Pulldown).
+  * Türkçe karakter ve boşluk fark etmez ("sinav" > Şınav).
+  * Gri × hareketin adını siler, kırmızı × hareketi tamamen kaldırır.
+  * Listede olmayan hareketler serbestçe yazılabilir.
+- Birleşik set:
+  * İki hareketin arasındaki "Birleşik set yap" düğmesine dokununca hareketler birleşir.
+  * İkiden fazla hareket de birleştirilebilir. Aynı düğmeye tekrar dokununca ayrılırlar.
+  * Birleşik setteki hareketlerin set sayısı aynı olmalıdır.
+  * Antrenmanda, geçmişte ve program detayında A1, A2 etiketli bir çerçevede görünür.
+- Oluşturulan programlar düzenlenemez. Değişiklik için yeni program oluşturulur.
+
+
+4. ANA SAYFA
+------------
+- Bugünün antrenmanı küçük bir kart olarak görünür (gün adı, hareket ve set sayısı).
+- Karta dokununca antrenmanın detayı açılır.
+- Haftalık şerit: haftanın günleri renkli durum noktalarıyla gösterilir.
+- Özet: bu hafta tamamlanan antrenman sayısı ve güncel kilo / hedefe kalan kilo.
+
+
+5. ANTRENMAN GİRİŞİ VE TAMAMLAMA
+--------------------------------
+- Her hareketin ağırlığı önceki haftalara göre otomatik doldurulur.
+- O gün plandan farklı yapıldıysa (örn. plan 20 kg, yapılan 17,5 kg):
+  * her hareketin ağırlığı değiştirilebilir,
+  * set sayısı − / + ile değiştirilebilir (1-10).
+  * Planlanan değer "Plan: 20 kg · 3 set" olarak hareketin altında görünür.
+  * "Tamamla"ya basılana kadar her şey değiştirilebilir.
+- Tekrar alanları her zaman boş gelir. Kullanıcı her sette kaç tekrar yaptığını yazar.
+- Yazılanlar anında kaydedilir; uygulama kapansa da kaybolmaz.
+- "Tamamla"ya basınca (en az bir set girilmiş olmalı):
+  * "Hangi hareketlerde ağırlığı artırmaya hazırsın?" diye sorulur.
+  * Bir, birkaç ya da tüm hareketler seçilebilir.
+  * Seçilen her hareket için kaç kg artırılacağı yazılır (varsayılan değer yoktur).
+  * Bu artış gelecek haftanın aynı gününde aynı harekete yansır.
+  * Seçilmeyen hareketler aynı ağırlıkta kalır.
+  * Birleşik setteki hareketler de ayrı ayrı sorulur; biri artırılıp diğeri aynı bırakılabilir.
+- Antrenman artık "Tamamlandı" olarak görünür ve kilitlenir; bilgiler bir daha değiştirilemez.
+- Plandan farklı yapılan hareketlerde geçmişte "Plan: ... idi" notu görünür.
+- Gelecek haftanın ağırlığı, gerçekte yapılan ağırlık + seçilen artış üzerinden hesaplanır.
+
+
+6. HAFTALIK PROGRAM
+-------------------
+- "Bu Hafta" ve "Gelecek Hafta" sekmeleri vardır.
+- Gün durumları:
+  * Tamamlandı
+  * Tamamlanmadı: geçmiş bir gün yapılmadıysa
+  * Bugün
+  * Yaklaşan
+  * Off Day: dinlenme günü
+  * Aktif değildi: program o tarihte henüz aktif edilmemişti
+- Geçmiş günler sonradan doldurulamaz.
+- Gelecek hafta: bu haftanın aynı günü tamamlanmadıysa ağırlık yerine
+  "Ağırlık durumu henüz belirlenmedi" yazar.
+
+
+7. GEÇMİŞ
+---------
+- Aktif programla tamamlanan tüm antrenmanlar listelenir.
+- Her kayıtta tarih, hareketler, ağırlıklar, her setin tekrar sayısı ve
+  gelecek hafta için yapılan artış görünür.
+
+
+8. PROGRAMLARIM
+---------------
+- Oluşturulan tüm programlar verilen adlarıyla listelenir.
+- Her programın yanında "Aktif et" kutusu vardır. Aynı anda yalnızca bir program aktif olabilir.
+- Programa dokununca:
+  * o program aktifken yapılan tüm antrenmanların geçmişi,
+  * programın gün gün yapısı görünür.
+
+
+9. KİLO TAKİBİ
+--------------
+- Her 2 haftada bir ana sayfada "Tartılma zamanı!" kartı çıkar ve kilo sorulur.
+- "Bugün değil" denirse soru ertesi gün tekrar gelir.
+- Kilo Takibi sayfasında şunlar görünür:
+  * şu anki kilo ve hedef
+  * başlangıç kilosu ve toplam değişim
+  * sonraki tartılma tarihi
+  * tüm kilo kayıtları (hedefe yaklaşınca yeşil, uzaklaşınca turuncu)
+- 2 haftayı beklemeden de kilo kaydı eklenebilir.
+
+
+10. PROFİL
+----------
+- Kişisel bilgiler ve vücut kitle indeksi görüntülenir; bilgiler düzenlenebilir.
+- Kilo takibi sayfasına buradan da gidilir.
+- Yedekleme: tüm veriler panoya kopyalanır (örn. Notlar'a yapıştırmak için) ve
+  istenince yedekten geri yüklenir.
+- "Tüm verileri sil" ile uygulama sıfırlanır (iki kez dokunarak onaylanır).
+
+
+11. GÜNCELLEMELER
+-----------------
+- Yeni sürümler otomatik gelir. Görmek için uygulamayı kapatıp açmak yeterlidir
+  (gerekirse iki kez).
