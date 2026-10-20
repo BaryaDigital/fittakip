@@ -3,10 +3,10 @@
 > Projeye geri dönüldüğünde önce bu dosya okunur. Her çalışma oturumunun sonunda güncellenir (en yeni kayıt en üstte).
 
 ## Şu anki durum (20 Ekim 2026)
-- **Sürüm:** v4 (`sw.js` → `VERSION = 'fittakip-v4'`)
+- **Sürüm:** v5 (`sw.js` → `VERSION = 'fittakip-v5'`)
 - **Depo:** https://github.com/lByRootl/fittakip (`main` dalı)
 - **Durum:** Uygulama çalışır durumda. Planlanan tüm temel işlevler bitti (bkz. `plan.md`).
-- **Kaldığımız yer:** Uygulama GitHub Pages'te yayında (https://lbyrootl.github.io/fittakip/) ve kullanıcının telefonunda kurulu. En son ağırlık artırma sorusu, hareket başına kg miktarı yazılacak şekilde değiştirildi.
+- **Kaldığımız yer:** Uygulama GitHub Pages'te yayında (https://lbyrootl.github.io/fittakip/) ve kullanıcının telefonunda kurulu. En son Android için maskable ikon eklendi (uygulama başka bir Android cihazda da kullanılacak).
 
 ## Sıradaki adımlar
 1. [x] Depo public yapıldı, GitHub Pages açıldı, telefona kuruldu
@@ -26,6 +26,7 @@
 - Kullanıcı isteğiyle eklendi: program oluştururken **hareket adı otomatik tamamlama**. ~150 hareketlik dahili liste, Türkçe karakter ve boşluk duyarsız arama, seçimi silmek için × butonu. Sürüm v3.
 - Otomatik test sayısı 52'ye çıktı, hepsi geçiyor.
 - Kullanıcı isteğiyle değişti: ağırlık artırma sorusunda **sabit 2,5 kg kaldırıldı**. Seçilen her hareket için artış miktarı kg olarak yazılıyor ve gelecek haftanın aynı gününe yansıyor. Eski kayıtlar 2,5 kg olarak okunmaya devam ediyor. Sürüm v4, 55 test geçiyor.
+- Uygulamanın Android'de de (başka bir kişi, başka ağ) aynı adresten kurulabileceği konuşuldu. Android için **maskable ikonlar** eklendi. Sürüm v5. Gerçek Android cihazda henüz test edilmedi.
 
 ### Oturum 1 (20 Ekim 2026)
 - Platform kararı alındı: Windows + iPhone 15 olduğu için PWA (native için Mac/Xcode gerekiyor).

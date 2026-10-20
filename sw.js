@@ -1,7 +1,7 @@
 // Uygulama dosyalarını önbelleğe alır, internet olmadan da çalışmasını sağlar.
 // Dosyaları güncelledikten sonra VERSION değerini artır.
-const VERSION = 'fittakip-v4';
-const FILES = ['./', 'index.html', 'style.css', 'app.js', 'manifest.webmanifest', 'icon-180.png', 'icon-192.png', 'icon-512.png'];
+const VERSION = 'fittakip-v5';
+const FILES = ['./', 'index.html', 'style.css', 'app.js', 'manifest.webmanifest', 'icon-180.png', 'icon-192.png', 'icon-512.png', 'icon-maskable-192.png', 'icon-maskable-512.png'];
 
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(VERSION).then(c => c.addAll(FILES)).then(() => self.skipWaiting()));

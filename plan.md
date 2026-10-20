@@ -8,6 +8,7 @@ FitTakip, tek bir kişinin kendi iPhone'unda (iPhone 15) kullanacağı kişisel 
 - **Barındırma:** GitHub Pages: https://github.com/lByRootl/fittakip
 - **Veri:** Tüm veriler telefonda, `localStorage` içinde (`fittakip.v1` anahtarı). Sunucu ya da veritabanı yok.
 - **Dil:** Arayüz Türkçe.
+- **Diğer cihazlar:** Aynı adresten Android'de de kurulabilir (Chrome → ⋮ → "Uygulamayı yükle"). Her cihazın verisi kendi içinde ayrı tutulur.
 
 ## Teknik yapı
 Derleme adımı ya da kütüphane yok; düz HTML/CSS/JavaScript.
@@ -19,7 +20,8 @@ Derleme adımı ya da kütüphane yok; düz HTML/CSS/JavaScript.
 | `app.js` | Uygulamanın tamamı: veri katmanı, program oluşturucu, ekranlar, olaylar |
 | `sw.js` | Service worker (çevrimdışı önbellek). **Her güncellemede `VERSION` artırılmalı.** |
 | `manifest.webmanifest` | Ana ekran uygulaması ayarları |
-| `icon-180/192/512.png` | Uygulama ikonları |
+| `icon-180/192/512.png` | Uygulama ikonları (iPhone ve genel) |
+| `icon-maskable-192/512.png` | Android ikonları: dambıl %80 küçük, başlatıcı daire/şekil kesse de kırpılmaz |
 
 **Ekranlar (hash yönlendirme):** `#/home`, `#/week/0|1`, `#/day/<tarih>`, `#/history`, `#/log/<id>`, `#/programs`, `#/program/<id>`, `#/new-program`, `#/ai`, `#/profile`, `#/edit-profile`, `#/weight`
 
