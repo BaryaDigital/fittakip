@@ -216,9 +216,9 @@ h1, h2, h3 { margin: 0; }
 .cb.on { color: var(--ok); }
 .pd-day { padding: 12px 14px; }
 .pd-day .row { justify-content: space-between; }
-.pd-day ul { margin: 8px 0 0; padding: 0; list-style: none; }
-.pd-day li { display: flex; justify-content: space-between; gap: 10px; font-size: 14px; padding: 5px 0; border-top: 1px solid var(--line); }
-.pd-day li span:last-child { color: var(--muted); white-space: nowrap; }
+.pd-list { margin-top: 8px; }
+.pd-ex { display: flex; justify-content: space-between; gap: 10px; font-size: 14px; padding: 5px 0; border-top: 1px solid var(--line); }
+.pd-ex span:last-child { color: var(--muted); white-space: nowrap; }
 .hist { display: flex; align-items: center; gap: 12px; background: var(--card); border-radius: var(--radius); padding: 13px 14px; margin-bottom: 8px; }
 .hist .mid { flex: 1; min-width: 0; }
 .hist .ttl { font-weight: 700; }
@@ -298,3 +298,20 @@ textarea { min-height: 110px; font-size: 12px; font-family: ui-monospace, Menlo,
 .inc-row .unit-input span { right: 10px; font-size: 13px; }
 .inc-prev { font-size: 13px; color: var(--muted); min-width: 66px; text-align: right; }
 .inc-prev b { color: var(--ok); }
+
+/* ---------- Birleşik set ---------- */
+.ss { border: 2px solid var(--off); border-radius: calc(var(--radius) + 4px); padding: 8px 8px 0; margin-bottom: 12px; background: var(--off-soft); }
+.ss-head { font-weight: 800; font-size: 13px; color: var(--off); padding: 2px 6px 8px; text-transform: uppercase; letter-spacing: .04em; }
+.ss-head span { display: block; text-transform: none; letter-spacing: 0; font-weight: 500; color: var(--muted); font-size: 12px; margin-top: 1px; }
+.ss .card { margin-bottom: 8px; }
+.ss-tag { display: inline-block; background: var(--off); color: #fff; font-size: 11px; font-weight: 800; border-radius: 6px; padding: 2px 6px; margin-right: 7px; vertical-align: 2px; }
+.pd-list .ss { padding: 4px 8px; margin: 6px 0; border-width: 1px; }
+.pd-list .ss-head { padding: 4px 0; }
+.pd-list .ss-head span { display: none; }
+.pd-list .ss .pd-ex:first-of-type { border-top: 0; }
+.modal .ss { padding: 8px 8px 0; }
+.b-ss { border: 2px solid var(--off); border-radius: 14px; padding: 8px; margin-top: 10px; }
+.b-ss .b-ex:first-of-type { margin-top: 6px; }
+.b-ss-head { font-weight: 800; font-size: 12.5px; color: var(--off); text-transform: uppercase; letter-spacing: .04em; padding: 2px 4px; }
+.link-chip { margin: 8px auto 0; width: max-content; max-width: 100%; padding: 7px 12px; border-radius: 99px; font-size: 12.5px; font-weight: 600; color: var(--muted); border: 1px dashed var(--line); }
+.link-chip.on { color: var(--off); border: 1px solid var(--off); background: var(--off-soft); }

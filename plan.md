@@ -27,7 +27,7 @@ Derleme adımı ya da kütüphane yok; düz HTML/CSS/JavaScript.
 
 **Veri modeli (`S`):**
 - `profile`: ad, soyad, boy, kilo, hedef kilo, amaç, haftalık gün, yer, seviye
-- `programs[]`: `{id, name, source: 'ai'|'custom', createdAt, activatedOn, note, days[7]}`. Her gün ya `{off: true}` ya da `{title, exercises[{id, name, sets, reps, startWeight, bw}]}`.
+- `programs[]`: `{id, name, source: 'ai'|'custom', createdAt, activatedOn, note, days[7]}`. Her gün ya `{off: true}` ya da `{title, exercises[{id, name, sets, reps, startWeight, bw, link}]}`.
 - `activeProgramId`: aynı anda yalnızca bir aktif program
 - `logs[]`: tamamlanan antrenmanlar `{programId, date, dayIndex, title, exercises[{exId, weight, reps[], increase}]}`
 - `weights[]`: vücut ağırlığı kayıtları `{date, kg}`
@@ -48,6 +48,7 @@ Kurulumdan sonra kullanıcıya program önerir; kullanıcı ister kullanır, ist
 ### 3. Kendi programını oluşturma
 Program adı; her gün için "Antrenman" ya da "Off Day"; hareket adı, set, hedef tekrar ve başlangıç ağırlığı.
 - **Hareket adı otomatik tamamlama:** Uygulamanın içinde ~150 hareketlik bir liste (`EXERCISE_DB`, app.js) var. Yazmaya başlayınca adında o metin geçen en fazla 8 öneri çıkıyor (ör. "lat" → Lat Pulldown, Lateral Raise...). Arama Türkçe karakter ve boşluk duyarsız ("sinav" → Şınav, "pull down" → Lat Pulldown). Sıralama: adı yazılanla başlayanlar → bir kelimesi yazılanla başlayanlar → adında geçenler; aynı grupta kısa adlar önce. Seçilen ad × ile silinebiliyor. Listede olmayan bir ad da serbestçe yazılabiliyor.
+- **Birleşik set:** İki hareketin arasındaki "🔗 Birleşik set yap" düğmesiyle hareketler birleştirilir (2, 3 ya da daha fazla). Veride hareketin `link: true` alanı "önceki hareketle aynı grupta" demektir. Gruptaki hareketlerin set sayısı aynı olmalı. Antrenman, geçmiş, program detayı ve artırma penceresinde A1/A2 etiketli çerçevede gösterilir. **Ağırlık ve artış her hareket için ayrıdır**; artırma sorusu birleşik setteki her hareket için ayrı sorulur.
 - **Programlar oluşturulduktan sonra düzenlenemez.** Değişiklik için yeni program oluşturulur. Düzenleme mantığına henüz karar verilmedi.
 
 ### 4. Ana sayfa

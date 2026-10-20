@@ -576,6 +576,25 @@ function vWeek(which) {
    ========================================================= */
 const draftKey = (pid, date) => 'w|' + pid + '|' + date;
 
+/* Birleşik setler: bir hareketin `link` alanı true ise önceki hareketle aynı gruptadır.
+   Ağırlık ve artış her hareket için ayrı tutulur; gruplama sadece gösterim içindir. */
+function groupExercises(list) {
+  const groups = [];
+  list.forEach(e => { if (e.link && groups.length) groups[groups.length - 1].push(e); else groups.push([e]); });
+  return groups;
+}
+// one(hareket, etiket): tek hareketi çizer; birleşik setler A1/A2 etiketiyle bir çerçeveye alınır
+function renderGrouped(list, one) {
+  let letter = 0;
+  return groupExercises(list).map(g => {
+    if (g.length === 1) return one(g[0], '');
+    const L = String.fromCharCode(65 + letter++);
+    return '<div class="ss"><div class="ss-head">🔗 Birleşik Set ' + L + '<span>' + g.length + ' hareket arka arkaya, aralarında dinlenme yok</span></div>' +
+      g.map((e, i) => one(e, L + (i + 1))).join('') + '</div>';
+  }).join('');
+}
+const ssTag = tag => (tag ? '<span class="ss-tag">' + tag + '</span>' : '');
+
 function vDay(date) {
   const p = activeProgram();
   if (!p || !date) return { title: 'Antrenman', tab: 'week', back: '#/week', body: '<div class="card empty">Aktif bir programın yok.</div>' };
@@ -598,19 +617,19 @@ function vDay(date) {
   // Bugünün antrenmanı: giriş modu
   if (st === 'today') {
     const dr = S.drafts[draftKey(p.id, date)] || { w: {}, r: {} };
-    day.exercises.forEach(ex => {
+    body += renderGrouped(day.exercises, (ex, tag) => {
       const pw = plannedWeight(p, date, ex);
       const wVal = dr.w[ex.id] != null ? dr.w[ex.id] : (pw.value != null ? fmtKg(pw.value) : '');
       const reps = dr.r[ex.id] || [];
-      body += '<div class="card ex"><div class="ex-name">' + h(ex.name) + '</div>' +
+      let out = '<div class="card ex"><div class="ex-name">' + ssTag(tag) + h(ex.name) + '</div>' +
         '<div class="ex-target">' + ex.sets + ' set' + (ex.reps ? ' · Hedef ' + h(ex.reps) : '') + '</div>' +
         '<div class="wline"><span class="lbl">Ağırlık (kg)' + (pw.inc ? ' <span class="up">↑ +' + fmtKg(pw.inc) + '</span>' : '') + '</span>' +
         '<input type="text" inputmode="decimal" data-w="' + ex.id + '" value="' + h(wVal) + '" placeholder="' + (ex.bw ? 'VA' : 'kg') + '"></div>' +
         '<div class="sets">';
       for (let i = 0; i < ex.sets; i++) {
-        body += '<div class="set-row"><span class="sn">Set ' + (i + 1) + '</span><input type="text" inputmode="numeric" pattern="[0-9]*" data-r="' + ex.id + '" data-i="' + i + '" value="' + h(reps[i] == null ? '' : reps[i]) + '" placeholder="tekrar"></div>';
+        out += '<div class="set-row"><span class="sn">Set ' + (i + 1) + '</span><input type="text" inputmode="numeric" pattern="[0-9]*" data-r="' + ex.id + '" data-i="' + i + '" value="' + h(reps[i] == null ? '' : reps[i]) + '" placeholder="tekrar"></div>';
       }
-      body += '</div></div>';
+      return out + '</div></div>';
     });
     body += '<div class="err" id="day-err"></div>';
     if (p.note) body += '<div class="info">💡 ' + h(p.note) + '</div>';
@@ -622,13 +641,13 @@ function vDay(date) {
   else if (st === 'na') body += '<div class="banner na">Bu tarihte program henüz aktif değildi.</div>';
   else body += '<div class="banner upcoming">Bu antrenman ' + (isNextWeek ? 'gelecek hafta' : 'bu hafta') + ' ' + DAY_NAMES[di] + ' günü yapılacak.</div>';
 
-  day.exercises.forEach(ex => {
+  body += renderGrouped(day.exercises, (ex, tag) => {
     const pw = plannedWeight(p, date, ex);
-    body += '<div class="card ex"><div class="ex-name">' + h(ex.name) + '</div>' +
+    let out = '<div class="card ex"><div class="ex-name">' + ssTag(tag) + h(ex.name) + '</div>' +
       '<div class="ex-target">' + ex.sets + ' set' + (ex.reps ? ' · Hedef ' + h(ex.reps) : '') + '</div>' +
       '<div class="wline"><span class="lbl">Ağırlık</span>' + weightHtml(pw, ex) + '</div><div class="sets">';
-    for (let i = 0; i < ex.sets; i++) body += '<div class="set-row"><span class="sn">Set ' + (i + 1) + '</span><div class="box">— tekrar</div></div>';
-    body += '</div></div>';
+    for (let i = 0; i < ex.sets; i++) out += '<div class="set-row"><span class="sn">Set ' + (i + 1) + '</span><div class="box">— tekrar</div></div>';
+    return out + '</div></div>';
   });
   return { title, tab: 'week', back, body };
 }
@@ -636,17 +655,17 @@ function vDay(date) {
 function logBody(log, p) {
   let body = '<div class="day-head"><div class="row"><span class="muted small">' + DAY_NAMES[log.dayIndex] + ', ' + fmtDate(log.date) + '</span>' + badge('done') + '</div><h2>' + h(log.title) + '</h2></div>';
   if (p && log.programId !== S.activeProgramId) body += '<div class="info">Program: ' + h(p.name) + '</div>';
-  log.exercises.forEach(e => {
-    body += '<div class="card ex"><div class="ex-name">' + h(e.name) + '</div>' +
+  body += renderGrouped(log.exercises, (e, tag) => {
+    let out = '<div class="card ex"><div class="ex-name">' + ssTag(tag) + h(e.name) + '</div>' +
       '<div class="ex-target">' + e.sets + ' set' + (e.target ? ' · Hedef ' + h(e.target) : '') + '</div>' +
       '<div class="wline"><span class="lbl">Ağırlık</span>' +
       (e.weight != null ? '<span class="wtext">' + fmtKg(e.weight) + ' kg</span>' : '<span class="wtext pending">' + (e.bw ? 'Vücut ağırlığı' : 'Girilmedi') + '</span>') +
       '</div><div class="sets">';
     for (let i = 0; i < e.sets; i++) {
       const r = e.reps[i];
-      body += '<div class="set-row"><span class="sn">Set ' + (i + 1) + '</span><div class="box' + (r != null ? ' val' : '') + '">' + (r != null ? r + ' tekrar' : 'yapılmadı') + '</div></div>';
+      out += '<div class="set-row"><span class="sn">Set ' + (i + 1) + '</span><div class="box' + (r != null ? ' val' : '') + '">' + (r != null ? r + ' tekrar' : 'yapılmadı') + '</div></div>';
     }
-    body += '</div>' + (incOf(e) ? '<div class="up" style="margin-top:8px">↑ +' + fmtKg(incOf(e)) + ' kg · sonraki hafta ' + fmtKg(e.weight + incOf(e)) + ' kg</div>' : '') + '</div>';
+    return out + '</div>' + (incOf(e) ? '<div class="up" style="margin-top:8px">↑ +' + fmtKg(incOf(e)) + ' kg · sonraki hafta ' + fmtKg(e.weight + incOf(e)) + ' kg</div>' : '') + '</div>';
   });
   return body;
 }
@@ -664,7 +683,7 @@ function completeWorkout(date) {
     }
     // Kullanıcı ağırlık alanına dokunmadıysa planlanan ağırlık geçerlidir
     const w = dr.w[ex.id] != null ? num(dr.w[ex.id]) : plannedWeight(p, date, ex).value;
-    return { exId: ex.id, name: ex.name, sets: ex.sets, target: ex.reps || '', bw: !!ex.bw, weight: w == null ? null : w, reps, increase: 0 };
+    return { exId: ex.id, name: ex.name, sets: ex.sets, target: ex.reps || '', bw: !!ex.bw, link: !!ex.link, weight: w == null ? null : w, reps, increase: 0 };
   });
   if (!exercises.some(e => e.reps.some(r => r != null))) {
     const err = document.getElementById('day-err');
@@ -695,18 +714,19 @@ function drawModal(focusId) {
     const all = selectable.every(e => c.sel[e.exId]);
     html += '<div class="row" style="justify-content:flex-end;margin-bottom:8px"><button class="btn ghost small" data-act="pick-all">' + (all ? 'Hiçbirini seçme' : 'Tümünü seç') + '</button></div>';
   }
-  c.exercises.forEach(e => {
+  // Birleşik setteki hareketler de ayrı ayrı seçilir ve her birine ayrı miktar yazılır
+  html += renderGrouped(c.exercises, (e, tag) => {
     const dis = e.weight == null;
     const sel = !!c.sel[e.exId];
-    html += '<div class="pick-wrap' + (sel ? ' sel' : '') + '"><div class="pick' + (sel ? ' sel' : '') + (dis ? ' dis' : '') + '"' + (dis ? '' : ' data-act="pick" data-id="' + e.exId + '"') + '>' +
-      '<div class="bx">' + (sel ? '✓' : '') + '</div><div class="mid"><div class="nm">' + h(e.name) + '</div>' +
+    let html = '<div class="pick-wrap' + (sel ? ' sel' : '') + '"><div class="pick' + (sel ? ' sel' : '') + (dis ? ' dis' : '') + '"' + (dis ? '' : ' data-act="pick" data-id="' + e.exId + '"') + '>' +
+      '<div class="bx">' + (sel ? '✓' : '') + '</div><div class="mid"><div class="nm">' + ssTag(tag) + h(e.name) + '</div>' +
       '<div class="w">' + (dis ? 'Ağırlık girilmedi' : 'Bu hafta ' + fmtKg(e.weight) + ' kg') + '</div></div></div>';
     if (sel) {
       html += '<div class="inc-row"><span class="lbl">Kaç kg artıracaksın?</span>' +
         '<div class="unit-input"><input type="text" inputmode="decimal" data-inc="' + e.exId + '" value="' + h(c.amt[e.exId] || '') + '"><span>kg</span></div>' +
         '<span class="inc-prev" data-prev="' + e.exId + '">' + incPreview(e) + '</span></div>';
     }
-    html += '</div>';
+    return html + '</div>';
   });
   html += '<div class="err" id="modal-err"></div>' +
     '<button class="btn" data-act="save-workout" style="margin-top:14px">Kaydet ve Tamamla</button>' +
@@ -793,8 +813,8 @@ function vPrograms() {
 function programStructure(p) {
   return p.days.map((d, i) => {
     if (d.off) return '<div class="card pd-day"><div class="row"><b>' + DAY_NAMES[i] + '</b>' + badge('off') + '</div></div>';
-    return '<div class="card pd-day"><div class="row"><b>' + DAY_NAMES[i] + '</b><span class="muted small">' + h(d.title) + '</span></div><ul>' +
-      d.exercises.map(e => '<li><span>' + h(e.name) + '</span><span>' + e.sets + ' set' + (e.reps ? ' × ' + h(e.reps) : '') + '</span></li>').join('') + '</ul></div>';
+    return '<div class="card pd-day"><div class="row"><b>' + DAY_NAMES[i] + '</b><span class="muted small">' + h(d.title) + '</span></div><div class="pd-list">' +
+      renderGrouped(d.exercises, (e, tag) => '<div class="pd-ex"><span>' + ssTag(tag) + h(e.name) + '</span><span>' + e.sets + ' set' + (e.reps ? ' × ' + h(e.reps) : '') + '</span></div>') + '</div></div>';
   }).join('');
 }
 
@@ -849,14 +869,19 @@ function vNewProgram() {
       '<div class="' + (d.off ? 'on offon' : '') + '" data-act="np-off" data-d="' + i + '" data-v="1">Off Day</div></div></div>';
     if (!d.off) {
       body += '<input type="text" data-bind="np-title" data-d="' + i + '" value="' + h(d.title) + '" placeholder="Gün adı (örn. Göğüs & Arka Kol)" style="margin-top:12px">';
-      d.exercises.forEach((e, j) => {
-        const a = ' data-d="' + i + '" data-j="' + j + '"';
-        body += '<div class="b-ex"><div class="name-wrap"><input type="text" data-bind="np-ex-name"' + a + ' value="' + h(e.name) + '" placeholder="Hareket adı (örn. lat)" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">' +
-          '<span class="clr" data-act="np-clear"' + a + '>×</span></div><div class="sugg"></div>' +
-          '<div class="row"><div><label>Set</label><input type="text" inputmode="numeric" pattern="[0-9]*" data-bind="np-ex-sets"' + a + ' value="' + h(e.sets) + '"></div>' +
-          '<div><label>Hedef tekrar</label><input type="text" data-bind="np-ex-reps"' + a + ' value="' + h(e.reps) + '" placeholder="8-12"></div>' +
-          '<div><label>Başl. kg</label><input type="text" inputmode="decimal" data-bind="np-ex-w"' + a + ' value="' + h(e.startWeight) + '" placeholder="—"></div>' +
-          '<div class="del" data-act="np-del"' + a + '>×</div></div></div>';
+      // Hareketler arasında birleştir/ayır düğmesi; birleşik gruplar çerçeve içinde
+      const chip = (j, on) => '<div class="link-chip' + (on ? ' on' : '') + '" data-act="np-link" data-d="' + i + '" data-j="' + j + '">' +
+        (on ? '🔗 Birleşik set · ayırmak için dokun' : '🔗 Birleşik set yap') + '</div>';
+      let j = 0;
+      groupExercises(d.exercises).forEach((g, gi) => {
+        if (gi > 0) body += chip(j, false);
+        if (g.length > 1) body += '<div class="b-ss"><div class="b-ss-head">🔗 Birleşik Set · ' + g.length + ' hareket</div>';
+        g.forEach((e, k) => {
+          if (k > 0) body += chip(j, true);
+          body += builderExercise(e, i, j);
+          j++;
+        });
+        if (g.length > 1) body += '</div>';
       });
       body += '<div class="add-ex" data-act="np-add" data-d="' + i + '">+ Hareket ekle</div>';
     }
@@ -865,8 +890,18 @@ function vNewProgram() {
   body += '<div class="err" id="np-err"></div>' +
     '<button class="btn" data-act="np-save" style="margin-top:8px">Programı kaydet</button>' +
     '<button class="btn secondary" data-act="np-reset">Formu temizle</button>' +
-    '<div class="info" style="margin-top:12px">Oluşturulan programlar düzenlenemez. Kaydetmeden önce kontrol et.</div>';
+    '<div class="info" style="margin-top:12px">Birleşik set için iki hareketin arasındaki "🔗 Birleşik set yap" düğmesine dokun. Oluşturulan programlar düzenlenemez; kaydetmeden önce kontrol et.</div>';
   return { title: 'Yeni Program', tab: 'programs', back: '#/programs', body };
+}
+
+function builderExercise(e, i, j) {
+  const a = ' data-d="' + i + '" data-j="' + j + '"';
+  return '<div class="b-ex"><div class="name-wrap"><input type="text" data-bind="np-ex-name"' + a + ' value="' + h(e.name) + '" placeholder="Hareket adı (örn. lat)" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">' +
+    '<span class="clr" data-act="np-clear"' + a + '>×</span></div><div class="sugg"></div>' +
+    '<div class="row"><div><label>Set</label><input type="text" inputmode="numeric" pattern="[0-9]*" data-bind="np-ex-sets"' + a + ' value="' + h(e.sets) + '"></div>' +
+    '<div><label>Hedef tekrar</label><input type="text" data-bind="np-ex-reps"' + a + ' value="' + h(e.reps) + '" placeholder="8-12"></div>' +
+    '<div><label>Başl. kg</label><input type="text" inputmode="decimal" data-bind="np-ex-w"' + a + ' value="' + h(e.startWeight) + '" placeholder="—"></div>' +
+    '<div class="del" data-act="np-del"' + a + '>×</div></div></div>';
 }
 
 function saveNewProgram() {
@@ -878,14 +913,20 @@ function saveNewProgram() {
   for (let i = 0; i < 7; i++) {
     const d = np.days[i];
     if (d.off) { days.push({ off: true }); continue; }
-    const exs = d.exercises.filter(e => e.name.trim());
-    if (!exs.length) return err(DAY_NAMES[i] + ' için en az bir hareket ekle (ya da Off Day yap).');
     const out = [];
-    for (const e of exs) {
+    let broken = false; // adı boş bırakılıp atlanan hareket yeni bir grup başlatıyorsa sonraki bağlantı kopar
+    for (const e of d.exercises) {
+      if (!e.name.trim()) { if (!e.link) broken = true; continue; }
       const sets = parseInt(e.sets, 10);
       if (!(sets >= 1 && sets <= 10)) return err(DAY_NAMES[i] + ' · ' + e.name + ': set sayısı 1-10 arası olmalı.');
-      out.push({ id: uid(), name: e.name.trim(), sets, reps: e.reps.trim(), startWeight: num(e.startWeight), bw: BODYWEIGHT.indexOf(e.name.trim()) >= 0 });
+      const link = !!e.link && !broken && out.length > 0;
+      broken = false;
+      if (link && out[out.length - 1].sets !== sets) {
+        return err(DAY_NAMES[i] + ' · ' + out[out.length - 1].name + ' + ' + e.name.trim() + ': birleşik setteki hareketlerin set sayısı aynı olmalı.');
+      }
+      out.push({ id: uid(), name: e.name.trim(), sets, reps: e.reps.trim(), startWeight: num(e.startWeight), bw: BODYWEIGHT.indexOf(e.name.trim()) >= 0, link });
     }
+    if (!out.length) return err(DAY_NAMES[i] + ' için en az bir hareket ekle (ya da Off Day yap).');
     days.push({ off: false, title: d.title.trim() || DAY_NAMES[i] + ' Antrenmanı', exercises: out });
   }
   const p = { id: uid(), name: np.name.trim(), source: 'custom', createdAt: today(), note: '', days };
@@ -1018,10 +1059,21 @@ document.addEventListener('click', e => {
       S.drafts.np.days[+ds.d].exercises.push(newEx());
       save(); rerender();
       break;
-    case 'np-del':
-      S.drafts.np.days[+ds.d].exercises.splice(+ds.j, 1);
+    case 'np-link': {
+      const ex = S.drafts.np.days[+ds.d].exercises[+ds.j];
+      ex.link = !ex.link;
       save(); rerender();
       break;
+    }
+    case 'np-del': {
+      const exs = S.drafts.np.days[+ds.d].exercises;
+      const j = +ds.j;
+      // Silinen hareketin sonrakiyle bağı, ancak silinen de öncekine bağlıysa sürer
+      if (exs[j + 1]) exs[j + 1].link = !!exs[j + 1].link && !!exs[j].link && j > 0;
+      exs.splice(j, 1);
+      save(); rerender();
+      break;
+    }
     case 'np-pick': {
       const ex = S.drafts.np.days[+ds.d].exercises[+ds.j];
       ex.name = ds.name;
