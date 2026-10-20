@@ -575,6 +575,16 @@ function vWeek(which) {
    Gün detayı / antrenman girişi
    ========================================================= */
 const draftKey = (pid, date) => 'w|' + pid + '|' + date;
+const MAX_SETS = 10;
+// Yarım kalan antrenman girişi: w = ağırlık, r = tekrarlar, s = o gün değiştirilen set sayısı
+function getDraft(pid, date, create) {
+  const k = draftKey(pid, date);
+  const dr = S.drafts[k] || { w: {}, r: {} };
+  if (!dr.s) dr.s = {};
+  if (create) S.drafts[k] = dr;
+  return dr;
+}
+const actualSets = (dr, ex) => (dr.s[ex.id] != null ? dr.s[ex.id] : ex.sets);
 
 /* Birleşik setler: bir hareketin `link` alanı true ise önceki hareketle aynı gruptadır.
    Ağırlık ve artış her hareket için ayrı tutulur; gruplama sadece gösterim içindir. */
@@ -616,17 +626,26 @@ function vDay(date) {
 
   // Bugünün antrenmanı: giriş modu
   if (st === 'today') {
-    const dr = S.drafts[draftKey(p.id, date)] || { w: {}, r: {} };
+    const dr = getDraft(p.id, date);
+    body += '<div class="info">Ağırlığı ve set sayısını o gün yaptığın gibi değiştirebilirsin. "Tamamla"ya bastıktan sonra antrenman kilitlenir.</div>';
     body += renderGrouped(day.exercises, (ex, tag) => {
       const pw = plannedWeight(p, date, ex);
       const wVal = dr.w[ex.id] != null ? dr.w[ex.id] : (pw.value != null ? fmtKg(pw.value) : '');
       const reps = dr.r[ex.id] || [];
+      const sets = actualSets(dr, ex);
+      const plan = [];
+      if (pw.value != null) plan.push(fmtKg(pw.value) + ' kg');
+      plan.push(ex.sets + ' set');
+      if (ex.reps) plan.push('hedef ' + h(ex.reps));
       let out = '<div class="card ex"><div class="ex-name">' + ssTag(tag) + h(ex.name) + '</div>' +
-        '<div class="ex-target">' + ex.sets + ' set' + (ex.reps ? ' · Hedef ' + h(ex.reps) : '') + '</div>' +
-        '<div class="wline"><span class="lbl">Ağırlık (kg)' + (pw.inc ? ' <span class="up">↑ +' + fmtKg(pw.inc) + '</span>' : '') + '</span>' +
+        '<div class="ex-target">Plan: ' + plan.join(' · ') + (pw.inc ? ' <span class="up">↑ +' + fmtKg(pw.inc) + '</span>' : '') + '</div>' +
+        '<div class="wline"><span class="lbl">Ağırlık (kg)</span>' +
         '<input type="text" inputmode="decimal" data-w="' + ex.id + '" value="' + h(wVal) + '" placeholder="' + (ex.bw ? 'VA' : 'kg') + '"></div>' +
+        '<div class="wline"><span class="lbl">Set sayısı</span><div class="stepper">' +
+        '<button data-act="set-minus" data-id="' + ex.id + '"' + (sets <= 1 ? ' disabled' : '') + '>−</button><span>' + sets + '</span>' +
+        '<button data-act="set-plus" data-id="' + ex.id + '"' + (sets >= MAX_SETS ? ' disabled' : '') + '>+</button></div></div>' +
         '<div class="sets">';
-      for (let i = 0; i < ex.sets; i++) {
+      for (let i = 0; i < sets; i++) {
         out += '<div class="set-row"><span class="sn">Set ' + (i + 1) + '</span><input type="text" inputmode="numeric" pattern="[0-9]*" data-r="' + ex.id + '" data-i="' + i + '" value="' + h(reps[i] == null ? '' : reps[i]) + '" placeholder="tekrar"></div>';
       }
       return out + '</div></div>';
@@ -652,6 +671,14 @@ function vDay(date) {
   return { title, tab: 'week', back, body };
 }
 
+// Yapılan, plandan farklıysa küçük bir not (eski kayıtlarda plan bilgisi yok)
+function planDiff(e) {
+  const parts = [];
+  if (e.plannedWeight != null && e.weight !== e.plannedWeight) parts.push(fmtKg(e.plannedWeight) + ' kg');
+  if (e.plannedSets != null && e.sets !== e.plannedSets) parts.push(e.plannedSets + ' set');
+  return parts.length ? '<div class="plan-diff">Plan: ' + parts.join(' · ') + ' idi</div>' : '';
+}
+
 function logBody(log, p) {
   let body = '<div class="day-head"><div class="row"><span class="muted small">' + DAY_NAMES[log.dayIndex] + ', ' + fmtDate(log.date) + '</span>' + badge('done') + '</div><h2>' + h(log.title) + '</h2></div>';
   if (p && log.programId !== S.activeProgramId) body += '<div class="info">Program: ' + h(p.name) + '</div>';
@@ -660,7 +687,7 @@ function logBody(log, p) {
       '<div class="ex-target">' + e.sets + ' set' + (e.target ? ' · Hedef ' + h(e.target) : '') + '</div>' +
       '<div class="wline"><span class="lbl">Ağırlık</span>' +
       (e.weight != null ? '<span class="wtext">' + fmtKg(e.weight) + ' kg</span>' : '<span class="wtext pending">' + (e.bw ? 'Vücut ağırlığı' : 'Girilmedi') + '</span>') +
-      '</div><div class="sets">';
+      '</div>' + planDiff(e) + '<div class="sets">';
     for (let i = 0; i < e.sets; i++) {
       const r = e.reps[i];
       out += '<div class="set-row"><span class="sn">Set ' + (i + 1) + '</span><div class="box' + (r != null ? ' val' : '') + '">' + (r != null ? r + ' tekrar' : 'yapılmadı') + '</div></div>';
@@ -673,21 +700,34 @@ function logBody(log, p) {
 function completeWorkout(date) {
   const p = activeProgram();
   const day = p.days[dayIdx(date)];
-  const dr = S.drafts[draftKey(p.id, date)] || { w: {}, r: {} };
+  const dr = getDraft(p.id, date);
+  const fail = msg => {
+    const err = document.getElementById('day-err');
+    if (err) { err.textContent = msg; err.scrollIntoView({ block: 'center' }); }
+  };
+  const badWeight = [];
   const exercises = day.exercises.map(ex => {
+    const sets = actualSets(dr, ex);
     const reps = [];
-    for (let i = 0; i < ex.sets; i++) {
+    for (let i = 0; i < sets; i++) {
       const v = (dr.r[ex.id] || [])[i];
       const n = v == null || String(v).trim() === '' ? null : parseInt(v, 10);
       reps.push(isFinite(n) ? n : null);
     }
     // Kullanıcı ağırlık alanına dokunmadıysa planlanan ağırlık geçerlidir
-    const w = dr.w[ex.id] != null ? num(dr.w[ex.id]) : plannedWeight(p, date, ex).value;
-    return { exId: ex.id, name: ex.name, sets: ex.sets, target: ex.reps || '', bw: !!ex.bw, link: !!ex.link, weight: w == null ? null : w, reps, increase: 0 };
+    const planned = plannedWeight(p, date, ex).value;
+    const typed = dr.w[ex.id];
+    const w = typed != null ? num(typed) : planned;
+    if (typed != null && String(typed).trim() !== '' && !(/^\d{1,4}([.,]\d{1,2})?$/.test(String(typed).trim()) && w <= 1000)) badWeight.push(ex.name);
+    return {
+      exId: ex.id, name: ex.name, sets, target: ex.reps || '', bw: !!ex.bw, link: !!ex.link,
+      weight: w == null ? null : w, reps, increase: 0,
+      plannedWeight: planned == null ? null : planned, plannedSets: ex.sets // geçmişte plan ile yapılanı karşılaştırmak için
+    };
   });
+  if (badWeight.length) return fail('Geçersiz ağırlık: ' + badWeight.join(', ') + '. Sadece sayı yaz (örn. 17,5).');
   if (!exercises.some(e => e.reps.some(r => r != null))) {
-    const err = document.getElementById('day-err');
-    if (err) { err.textContent = 'Tamamlamak için en az bir setin tekrar sayısını gir.'; err.scrollIntoView({ block: 'center' }); }
+    fail('Tamamlamak için en az bir setin tekrar sayısını gir.');
     return;
   }
   openProgressionModal(p, date, day, exercises);
@@ -1103,6 +1143,18 @@ document.addEventListener('click', e => {
     case 'complete':
       completeWorkout(ds.date);
       break;
+    case 'set-minus':
+    case 'set-plus': {
+      const p = activeProgram();
+      const date = location.hash.split('/')[2];
+      const ex = p.days[dayIdx(date)].exercises.find(x => x.id === ds.id);
+      const dr = getDraft(p.id, date, true);
+      const n = actualSets(dr, ex) + (act === 'set-plus' ? 1 : -1);
+      if (n < 1 || n > MAX_SETS) return;
+      dr.s[ex.id] = n;
+      save(); rerender();
+      break;
+    }
     case 'pick':
       modalCtx.sel[ds.id] = !modalCtx.sel[ds.id];
       drawModal(modalCtx.sel[ds.id] ? ds.id : null); // yeni seçilenin miktar alanına odaklan
@@ -1205,8 +1257,7 @@ document.addEventListener('input', e => {
     const p = activeProgram();
     const date = location.hash.split('/')[2];
     if (!p || !date) return;
-    const k = draftKey(p.id, date);
-    const dr = S.drafts[k] || (S.drafts[k] = { w: {}, r: {} });
+    const dr = getDraft(p.id, date, true);
     if (ds.w) dr.w[ds.w] = el.value;
     else { (dr.r[ds.r] || (dr.r[ds.r] = []))[+ds.i] = el.value; }
     save();

@@ -29,7 +29,7 @@ Derleme adımı ya da kütüphane yok; düz HTML/CSS/JavaScript.
 - `profile`: ad, soyad, boy, kilo, hedef kilo, amaç, haftalık gün, yer, seviye
 - `programs[]`: `{id, name, source: 'ai'|'custom', createdAt, activatedOn, note, days[7]}`. Her gün ya `{off: true}` ya da `{title, exercises[{id, name, sets, reps, startWeight, bw, link}]}`.
 - `activeProgramId`: aynı anda yalnızca bir aktif program
-- `logs[]`: tamamlanan antrenmanlar `{programId, date, dayIndex, title, exercises[{exId, weight, reps[], increase}]}`
+- `logs[]`: tamamlanan antrenmanlar `{programId, date, dayIndex, title, exercises[{exId, weight, sets, reps[], increase, link, plannedWeight, plannedSets}]}`
 - `weights[]`: vücut ağırlığı kayıtları `{date, kg}`
 - `drafts`: yarım kalan antrenman girişleri ve program oluşturma formu
 
@@ -58,6 +58,8 @@ Program adı; her gün için "Antrenman" ya da "Off Day"; hareket adı, set, hed
 ### 5. Antrenman girişi
 - Tekrar alanları her zaman boş gelir; kullanıcı yaptığı tekrarları yazar.
 - Ağırlık önceki haftadan hesaplanıp önceden doldurulur.
+- **O gün yapılana göre değiştirme:** "Tamamla"ya basılana kadar her hareketin ağırlığı ve set sayısı (− / +, 1-10) değiştirilebilir. Planlanan değer "Plan: 20 kg · 3 set" olarak görünür. Geçersiz ağırlık girişi kaydı engeller.
+- **Tamamlanınca kilit:** Kayıt salt okunur olur. Kayıtta `plannedWeight` / `plannedSets` da tutulur; plandan farklıysa geçmişte "Plan: … idi" notu çıkar. Gelecek haftanın ağırlığı, **gerçekte yapılan ağırlık + seçilen artış** üzerinden hesaplanır.
 - **Tamamla** → "Hangi hareketlerde ağırlığı artırmaya hazırsın?" (bir, birkaç ya da hepsi). Seçilen her hareket için **kaç kg artırılacağı kullanıcı tarafından yazılır**; varsayılan değer yok, seçilip miktarı yazılmayan hareket varsa kayıt engellenir. Her hareket kendi miktarıyla **gelecek haftanın aynı gününe** yansır; seçilmeyenler aynı ağırlıkta kalır.
   - Kayıtta `increase` alanı kg sayısıdır. Eski kayıtlarda `true` olanlar 2,5 kg olarak okunur (`incOf`).
 

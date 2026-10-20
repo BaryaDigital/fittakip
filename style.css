@@ -315,3 +315,10 @@ textarea { min-height: 110px; font-size: 12px; font-family: ui-monospace, Menlo,
 .b-ss-head { font-weight: 800; font-size: 12.5px; color: var(--off); text-transform: uppercase; letter-spacing: .04em; padding: 2px 4px; }
 .link-chip { margin: 8px auto 0; width: max-content; max-width: 100%; padding: 7px 12px; border-radius: 99px; font-size: 12.5px; font-weight: 600; color: var(--muted); border: 1px dashed var(--line); }
 .link-chip.on { color: var(--off); border: 1px solid var(--off); background: var(--off-soft); }
+
+/* ---------- Antrenman günü değişiklikleri ---------- */
+.stepper { display: flex; align-items: center; background: var(--card2); border: 1px solid var(--line); border-radius: 12px; width: 110px; }
+.stepper button { width: 36px; height: 40px; font-size: 22px; font-weight: 600; color: var(--accent); }
+.stepper button:disabled { color: var(--line); }
+.stepper span { flex: 1; text-align: center; font-weight: 700; }
+.plan-diff { font-size: 12.5px; color: var(--accent); margin: -4px 0 8px; text-align: right; }

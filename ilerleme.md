@@ -3,10 +3,10 @@
 > Projeye geri dönüldüğünde önce bu dosya okunur. Her çalışma oturumunun sonunda güncellenir (en yeni kayıt en üstte).
 
 ## Şu anki durum (20 Ekim 2026)
-- **Sürüm:** v6 (`sw.js` → `VERSION = 'fittakip-v6'`)
+- **Sürüm:** v7 (`sw.js` → `VERSION = 'fittakip-v7'`)
 - **Depo:** https://github.com/lByRootl/fittakip (`main` dalı)
 - **Durum:** Uygulama çalışır durumda. Planlanan tüm temel işlevler bitti (bkz. `plan.md`).
-- **Kaldığımız yer:** Uygulama GitHub Pages'te yayında (https://lbyrootl.github.io/fittakip/) ve kullanıcının telefonunda kurulu. En son birleşik set (süperset) özelliği eklendi.
+- **Kaldığımız yer:** Uygulama GitHub Pages'te yayında (https://lbyrootl.github.io/fittakip/) ve kullanıcının telefonunda kurulu. En son antrenman günü ağırlık ve set sayısını değiştirme eklendi (tamamlanınca kilitlenir).
 
 ## Sıradaki adımlar
 1. [x] Depo public yapıldı, GitHub Pages açıldı, telefona kuruldu
@@ -29,6 +29,7 @@
 - Uygulamanın Android'de de (başka bir kişi, başka ağ) aynı adresten kurulabileceği konuşuldu. Android için **maskable ikonlar** eklendi. Sürüm v5. Gerçek Android cihazda henüz test edilmedi.
 - Tüm işlevleri anlatan `FitTakip_Islevler.txt` oluşturuldu. **Kullanıcı isteğiyle GitHub'a gönderilmiyor**; `.git/info/exclude` ile yok sayılıyor. Yeni işlev eklenince bu dosya da güncellenmeli.
 - Kullanıcı isteğiyle eklendi: **birleşik set**. Program oluştururken hareketler birleştirilebiliyor; gruptaki hareketlerin set sayısı aynı olmalı. Ağırlık artırma sorusu birleşik setteki her hareket için ayrı soruluyor. Sürüm v6, 70 test geçiyor.
+- Kullanıcı isteğiyle eklendi: antrenman sırasında **ağırlık ve set sayısı plandan farklı girilebiliyor** (− / + ile set). "Tamamla"dan sonra kilitleniyor. Geçmişte plandan farklı olanlar "Plan: … idi" diye görünüyor; gelecek hafta gerçekte yapılan ağırlıktan hesaplanıyor. Sürüm v7, 80 test geçiyor.
 
 ### Oturum 1 (20 Ekim 2026)
 - Platform kararı alındı: Windows + iPhone 15 olduğu için PWA (native için Mac/Xcode gerekiyor).
