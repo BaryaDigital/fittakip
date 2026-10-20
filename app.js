@@ -51,18 +51,42 @@ const totalSets = day => day.exercises.reduce((a, e) => a + e.sets, 0);
 
 /* ---------------- Veri katmanı ---------------- */
 function emptyState() {
-  return { profile: null, programs: [], activeProgramId: null, logs: [], drafts: {} };
+  return { profile: null, programs: [], activeProgramId: null, logs: [], drafts: {}, weights: [], weighSnooze: null };
+}
+// Eski kayıtlarda kilo geçmişi yoksa profildeki kiloyla başlat
+function migrate(st) {
+  if (st.profile && !st.weights.length) {
+    const first = st.programs.length ? st.programs[0].createdAt : today();
+    st.weights.push({ date: first, kg: st.profile.weight });
+  }
+  return st;
 }
 let S = (() => {
   try {
     const raw = localStorage.getItem(STORE_KEY);
-    if (raw) return Object.assign(emptyState(), JSON.parse(raw));
+    if (raw) return migrate(Object.assign(emptyState(), JSON.parse(raw)));
   } catch (e) { /* bozuk veri: sıfırdan başla */ }
   return emptyState();
 })();
 function save() {
   try { localStorage.setItem(STORE_KEY, JSON.stringify(S)); }
   catch (e) { toast('Kaydedilemedi! Depolama dolu olabilir.'); }
+}
+
+/* ---------------- Vücut ağırlığı (2 haftada bir sorulur) ---------------- */
+const WEIGH_EVERY_DAYS = 14;
+const sortedWeights = () => S.weights.slice().sort((a, b) => (a.date < b.date ? -1 : 1));
+const lastWeight = () => { const w = sortedWeights(); return w[w.length - 1]; };
+const nextWeighDate = () => { const l = lastWeight(); return l ? addDays(l.date, WEIGH_EVERY_DAYS) : today(); };
+const weighDue = () => nextWeighDate() <= today() && S.weighSnooze !== today();
+
+function addWeight(kg, date) {
+  date = date || today();
+  S.weights = S.weights.filter(w => w.date !== date); // aynı gün tek kayıt
+  S.weights.push({ date, kg });
+  S.profile.weight = lastWeight().kg;
+  S.weighSnooze = null;
+  save();
 }
 
 const getProgram = id => S.programs.find(p => p.id === id);
@@ -275,7 +299,7 @@ function render() {
     const parts = location.hash.replace(/^#\/?/, '').split('/');
     const views = {
       home: vHome, week: vWeek, day: vDay, history: vHistory, log: vLog, programs: vPrograms,
-      program: vProgram, 'new-program': vNewProgram, ai: vAI, profile: vProfile, 'edit-profile': vEditProfile
+      program: vProgram, 'new-program': vNewProgram, ai: vAI, profile: vProfile, 'edit-profile': vEditProfile, weight: vWeight
     };
     const fn = views[parts[0]] || vHome;
     $app.innerHTML = layout(fn.apply(null, parts.slice(1).map(decodeURIComponent)));
@@ -381,6 +405,14 @@ function vHome() {
   const pr = S.profile;
   let body = '<div class="hello"><div class="date">' + fmtDate(t) + ', ' + DAY_NAMES[d] + '</div><h2>Merhaba ' + h(pr.firstName) + '!</h2></div>';
 
+  if (weighDue()) {
+    body += '<div class="card weigh-card"><div class="row"><span class="wc-ic">⚖️</span><div class="grow"><b>Tartılma zamanı!</b>' +
+      '<div class="muted small">2 haftada bir kilonu kaydediyoruz. Son kayıt: ' + fmtKg(lastWeight().kg) + ' kg (' + fmtShort(lastWeight().date) + ')</div></div></div>' +
+      '<div class="row" style="margin-top:12px"><div class="unit-input grow"><input id="weigh-in" type="text" inputmode="decimal" placeholder="' + fmtKg(lastWeight().kg) + '"><span>kg</span></div>' +
+      '<button class="btn small" data-act="weigh-save">Kaydet</button></div>' +
+      '<div class="err" id="weigh-err"></div><button class="btn ghost small" data-act="weigh-snooze" style="padding-left:0">Bugün değil</button></div>';
+  }
+
   if (!p) {
     body += '<div class="card empty">Aktif bir antrenman programın yok.<button class="btn" data-go="#/programs">Programlarım</button></div>';
     return { title: 'FitTakip', tab: 'home', body };
@@ -417,8 +449,44 @@ function vHome() {
   const diff = Math.round((pr.targetWeight - pr.weight) * 10) / 10;
   body += '<div class="section-title">Özet</div><div class="stats">' +
     '<div class="stat"><div class="v">' + done + ' / ' + planned + '</div><div class="l">Bu hafta tamamlanan</div></div>' +
-    '<div class="stat"><div class="v">' + fmtKg(pr.targetWeight) + ' kg</div><div class="l">Hedef (' + (diff > 0 ? '+' : '') + fmtKg(diff) + ' kg)</div></div></div>';
+    '<div class="stat" data-go="#/weight"><div class="v">' + fmtKg(pr.weight) + ' kg</div><div class="l">' +
+    (diff === 0 ? 'Hedefine ulaştın 🎉' : 'Hedefe ' + (diff > 0 ? '+' : '') + fmtKg(diff) + ' kg') + ' ›</div></div></div>';
   return { title: 'FitTakip', tab: 'home', body };
+}
+
+/* =========================================================
+   Kilo takibi
+   ========================================================= */
+function vWeight() {
+  const pr = S.profile;
+  const list = sortedWeights();
+  const first = list[0], last = list[list.length - 1];
+  const change = Math.round((last.kg - first.kg) * 10) / 10;
+  const kv = (k, v) => '<div class="kv"><span>' + k + '</span><span>' + v + '</span></div>';
+  let body = '<div class="stats" style="margin-bottom:12px">' +
+    '<div class="stat"><div class="v">' + fmtKg(last.kg) + ' kg</div><div class="l">Şu anki kilo</div></div>' +
+    '<div class="stat"><div class="v">' + fmtKg(pr.targetWeight) + ' kg</div><div class="l">Hedef kilo</div></div></div>' +
+    '<div class="card">' + kv('Başlangıç', fmtKg(first.kg) + ' kg · ' + fmtShort(first.date)) +
+    kv('Toplam değişim', (change > 0 ? '+' : '') + fmtKg(change) + ' kg') +
+    kv('Sonraki tartılma', nextWeighDate() <= today() ? 'Bugün' : fmtDate(nextWeighDate())) + '</div>' +
+    '<label class="f">Yeni kilo kaydı</label><div class="row"><div class="unit-input grow"><input id="weigh-in" type="text" inputmode="decimal" placeholder="' + fmtKg(last.kg) + '"><span>kg</span></div>' +
+    '<button class="btn small" data-act="weigh-save">Kaydet</button></div><div class="err" id="weigh-err"></div>' +
+    '<div class="section-title">Kilo geçmişi</div>';
+  list.slice().reverse().forEach((w, i, arr) => {
+    const prev = arr[i + 1];
+    const dd = prev ? Math.round((w.kg - prev.kg) * 10) / 10 : null;
+    body += '<div class="hist"><div class="mid"><div class="ttl">' + fmtKg(w.kg) + ' kg</div><div class="sub">' + fmtDate(w.date) + '</div></div>' +
+      (dd == null ? '<span class="badge na">Başlangıç</span>' : '<span class="wdiff' + (dd === 0 ? '' : (dd > 0) === (pr.targetWeight > first.kg) ? ' good' : ' bad') + '">' + (dd > 0 ? '+' : '') + fmtKg(dd) + ' kg</span>') + '</div>';
+  });
+  return { title: 'Kilo Takibi', tab: 'profile', back: '#/profile', body };
+}
+
+function saveWeighIn() {
+  const kg = num(document.getElementById('weigh-in').value);
+  if (!kg || kg < 30 || kg > 300) { document.getElementById('weigh-err').textContent = 'Lütfen geçerli bir kilo gir.'; return; }
+  addWeight(kg);
+  toast('Kilon kaydedildi: ' + fmtKg(kg) + ' kg');
+  rerender();
 }
 
 /* =========================================================
@@ -758,7 +826,7 @@ function vProfile() {
     kv('Ad Soyad', h(p.firstName + ' ' + p.lastName)) + kv('Boy', fmtKg(p.height) + ' cm') + kv('Kilo', fmtKg(p.weight) + ' kg') +
     kv('Hedef kilo', fmtKg(p.targetWeight) + ' kg') + kv('Vücut kitle indeksi', fmtKg(Math.round(bmi * 10) / 10)) +
     kv('Amaç', GOALS[p.goal].t) + kv('Haftalık gün', p.daysPerWeek + ' gün') + kv('Yer', LOCATIONS[p.location].t) + kv('Seviye', LEVELS[p.level].t) +
-    '</div><button class="btn secondary" data-go="#/edit-profile">Bilgilerimi düzenle</button>' +
+    '</div><button class="btn" data-go="#/weight">⚖️ Kilo takibi</button><button class="btn secondary" data-go="#/edit-profile">Bilgilerimi düzenle</button>' +
     '<div class="section-title">Yedekleme</div>' +
     '<div class="info">Tüm verilerin bu telefonda saklanır. Ara sıra yedeğini kopyalayıp Notlar\'a yapıştırman iyi olur.</div>' +
     '<button class="btn secondary" data-act="backup-copy">Yedeği panoya kopyala</button>' +
@@ -796,7 +864,9 @@ function saveProfile() {
   const err = document.getElementById('ep-err');
   if (!p.firstName || !p.lastName) return (err.textContent = 'Ad ve soyad boş olamaz.');
   if (!p.height || !p.weight || !p.targetWeight) return (err.textContent = 'Boy, kilo ve hedef kilo geçerli sayılar olmalı.');
+  const oldWeight = S.profile.weight;
   S.profile = p;
+  if (p.weight !== oldWeight) addWeight(p.weight); // kilo değiştiyse geçmişe de yaz
   aiDraft = null;
   save();
   toast('Bilgilerin güncellendi.');
@@ -832,6 +902,7 @@ document.addEventListener('click', e => {
       if (msg) { document.getElementById('ob-err').textContent = msg; return; }
       if (ob.step < OB_STEPS - 1) { ob.step++; render(); return; }
       S.profile = Object.assign({}, ob.data);
+      S.weights = [{ date: today(), kg: S.profile.weight }];
       save();
       aiDraft = null;
       location.hash = '#/ai/onboard';
@@ -903,6 +974,12 @@ document.addEventListener('click', e => {
       break;
 
     /* profil */
+    case 'weigh-save':
+      saveWeighIn();
+      break;
+    case 'weigh-snooze':
+      S.weighSnooze = today(); save(); rerender();
+      break;
     case 'ep-save':
       saveProfile();
       break;

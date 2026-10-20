@@ -267,3 +267,11 @@ textarea { min-height: 110px; font-size: 12px; font-family: ui-monospace, Menlo,
 .kv:first-child { border-top: 0; }
 .kv span:first-child { color: var(--muted); }
 .kv span:last-child { font-weight: 600; text-align: right; }
+
+/* ---------- Kilo takibi ---------- */
+.weigh-card { border: 2px solid var(--accent); }
+.weigh-card .wc-ic { font-size: 28px; }
+.weigh-card .btn.small, .view .row > .btn.small { padding: 13px 18px; }
+.wdiff { font-weight: 700; font-size: 14px; color: var(--muted); }
+.wdiff.bad { color: var(--accent); }
+.wdiff.good { color: var(--ok); }
