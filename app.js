@@ -74,6 +74,19 @@ function save() {
   catch (e) { toast('Kaydedilemedi! Depolama dolu olabilir.'); }
 }
 
+/* ---------------- Tema (koyu / açık) ----------------
+   Ayrı anahtarda tutulur; index.html açılışta okuyup uygular. */
+const THEME_KEY = 'fittakip.theme';
+const getTheme = () => { try { return localStorage.getItem(THEME_KEY) === 'light' ? 'light' : 'dark'; } catch (e) { return 'dark'; } };
+function setTheme(t) {
+  try { localStorage.setItem(THEME_KEY, t); } catch (e) { /* yoksay */ }
+  document.documentElement.setAttribute('data-theme', t);
+  const tc = document.querySelector('meta[name="theme-color"]');
+  if (tc) tc.setAttribute('content', t === 'light' ? '#f2f3f7' : '#16171d');
+  const sb = document.querySelector('meta[name="apple-mobile-web-app-status-bar-style"]');
+  if (sb) sb.setAttribute('content', t === 'light' ? 'default' : 'black-translucent');
+}
+
 /* ---------------- Vücut ağırlığı (2 haftada bir sorulur) ---------------- */
 const WEIGH_EVERY_DAYS = 14;
 const sortedWeights = () => S.weights.slice().sort((a, b) => (a.date < b.date ? -1 : 1));
@@ -989,6 +1002,10 @@ function vProfile() {
     kv('Hedef kilo', fmtKg(p.targetWeight) + ' kg') + kv('Vücut kitle indeksi', fmtKg(Math.round(bmi * 10) / 10)) +
     kv('Amaç', GOALS[p.goal].t) + kv('Haftalık gün', p.daysPerWeek + ' gün') + kv('Yer', LOCATIONS[p.location].t) + kv('Seviye', LEVELS[p.level].t) +
     '</div><button class="btn" data-go="#/weight">⚖️ Kilo takibi</button><button class="btn secondary" data-go="#/edit-profile">Bilgilerimi düzenle</button>' +
+    '<div class="section-title">Görünüm</div>' +
+    '<div class="seg theme-seg">' +
+    '<div class="' + (getTheme() === 'dark' ? 'on' : '') + '" data-act="theme" data-v="dark">🌙 Koyu</div>' +
+    '<div class="' + (getTheme() === 'light' ? 'on' : '') + '" data-act="theme" data-v="light">☀️ Açık</div></div>' +
     '<div class="section-title">Yedekleme</div>' +
     '<div class="info">Tüm verilerin bu telefonda saklanır. Ara sıra yedeğini kopyalayıp Notlar\'a yapıştırman iyi olur.</div>' +
     '<button class="btn secondary" data-act="backup-copy">Yedeği panoya kopyala</button>' +
@@ -1185,6 +1202,10 @@ document.addEventListener('click', e => {
       break;
     case 'ep-save':
       saveProfile();
+      break;
+    case 'theme':
+      setTheme(el.dataset.v);
+      render();
       break;
     case 'backup-copy': {
       const text = JSON.stringify(S);

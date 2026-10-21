@@ -122,6 +122,8 @@ Kurulum: iPhone'da Safari > Paylaş > "Ana Ekrana Ekle". Android'de Chrome > ⋮
 ----------
 - Kişisel bilgiler ve vücut kitle indeksi görüntülenir; bilgiler düzenlenebilir.
 - Kilo takibi sayfasına buradan da gidilir.
+- Görünüm: "Koyu" ya da "Açık" tema seçilir; istenildiği zaman değiştirilebilir.
+  Seçim telefonda hatırlanır. Varsayılan koyu tema.
 - Yedekleme: tüm veriler panoya kopyalanır (örn. Notlar'a yapıştırmak için) ve
   istenince yedekten geri yüklenir.
 - "Tüm verileri sil" ile uygulama sıfırlanır (iki kez dokunarak onaylanır).

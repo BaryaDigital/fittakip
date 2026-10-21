@@ -16,7 +16,7 @@ Derleme adımı ya da kütüphane yok; düz HTML/CSS/JavaScript.
 | Dosya | Görevi |
 |---|---|
 | `index.html` | Giriş sayfası, PWA meta etiketleri |
-| `style.css` | Tüm tasarım (koyu tema, mobil öncelikli) |
+| `style.css` | Tüm tasarım (koyu + açık tema, mobil öncelikli) |
 | `app.js` | Uygulamanın tamamı: veri katmanı, program oluşturucu, ekranlar, olaylar |
 | `sw.js` | Service worker (çevrimdışı önbellek). **Her güncellemede `VERSION` artırılmalı.** |
 | `FitTakip_Islevler.txt` | Tüm işlevlerin kısa, madde madde anlatımı (yeni işlevde güncellenmeli) |
@@ -80,6 +80,7 @@ Program adı; her gün için "Antrenman" ya da "Off Day"; hareket adı, set, hed
 
 ### 9. Profil
 - Bilgileri düzenleme, kilo takibine geçiş.
+- **Görünüm (tema):** Koyu / Açık. Seçim ayrı bir anahtarda (`fittakip.theme`) tutulur, program verisinden bağımsızdır ve yedeğe girmez. `index.html` başındaki küçük betik temayı sayfa çizilmeden uygular (`<html data-theme="light">`); renkler `style.css` içindeki `:root[data-theme="light"]` değişkenleriyle değişir. Açık temada iPhone durum çubuğu `default` stiline geçer.
 - Yedeği panoya kopyalama / yedekten geri yükleme.
 - Tüm verileri silme (iki kez dokunarak onay).
 

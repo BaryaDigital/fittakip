@@ -13,10 +13,44 @@
   --bad-soft: rgba(255, 84, 104, .16);
   --off: #7c8cff;
   --off-soft: rgba(124, 140, 255, .16);
+  --top-bg: rgba(22, 23, 29, .92);
+  --tabs-bg: rgba(28, 29, 36, .94);
+  --placeholder: #6b7080;
+  --toast-bg: #2f3240;
   --radius: 16px;
   --sat: env(safe-area-inset-top, 0px);
   --sab: env(safe-area-inset-bottom, 0px);
+  color-scheme: dark;
 }
+/* Açık tema (Profil → Görünüm) */
+:root[data-theme="light"] {
+  --bg: #f2f3f7;
+  --card: #ffffff;
+  --card2: #e9ebf1;
+  --line: #d5d8e1;
+  --text: #16171d;
+  --muted: #6b7080;
+  --accent: #f0581a;
+  --accent-soft: rgba(240, 88, 26, .12);
+  --ok: #1f9d5c;
+  --ok-soft: rgba(31, 157, 92, .13);
+  --bad: #e23b50;
+  --bad-soft: rgba(226, 59, 80, .12);
+  --off: #5a6cf0;
+  --off-soft: rgba(90, 108, 240, .12);
+  --top-bg: rgba(242, 243, 247, .92);
+  --tabs-bg: rgba(255, 255, 255, .94);
+  --placeholder: #a0a4b2;
+  --toast-bg: #16171d;
+  color-scheme: light;
+}
+:root[data-theme="light"] .card, :root[data-theme="light"] .stat, :root[data-theme="light"] .day-item,
+:root[data-theme="light"] .prog, :root[data-theme="light"] .hist, :root[data-theme="light"] .strip .sd,
+:root[data-theme="light"] .choice, :root[data-theme="light"] .chip, :root[data-theme="light"] .seg {
+  box-shadow: 0 1px 3px rgba(20, 22, 40, .07);
+}
+:root[data-theme="light"] .modal-bg { background: rgba(20, 22, 40, .4); }
+:root[data-theme="light"] #toast { box-shadow: 0 6px 24px rgba(0,0,0,.18); }
 
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 html, body { margin: 0; padding: 0; background: var(--bg); color: var(--text); }
@@ -35,7 +69,7 @@ input, select, textarea {
   padding: 12px 14px; width: 100%; outline: none; -webkit-appearance: none; appearance: none;
 }
 input:focus, select:focus, textarea:focus { border-color: var(--accent); }
-input::placeholder { color: #6b7080; }
+input::placeholder, textarea::placeholder { color: var(--placeholder); }
 select {
   background-image: linear-gradient(45deg, transparent 50%, var(--muted) 50%), linear-gradient(135deg, var(--muted) 50%, transparent 50%);
   background-position: calc(100% - 20px) 50%, calc(100% - 15px) 50%;
@@ -48,7 +82,7 @@ h1, h2, h3 { margin: 0; }
 .top {
   position: sticky; top: 0; z-index: 10;
   padding: calc(var(--sat) + 10px) 16px 10px;
-  background: rgba(22, 23, 29, .92);
+  background: var(--top-bg);
   -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
   display: flex; align-items: center; gap: 8px; min-height: 52px;
 }
@@ -61,7 +95,7 @@ h1, h2, h3 { margin: 0; }
   position: fixed; left: 0; right: 0; bottom: 0; z-index: 20;
   display: flex; justify-content: space-around;
   padding: 6px 4px calc(var(--sab) + 6px);
-  background: rgba(28, 29, 36, .94);
+  background: var(--tabs-bg);
   -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
   border-top: 1px solid var(--line);
 }
@@ -270,7 +304,7 @@ h1, h2, h3 { margin: 0; }
 .pick.sel .w b { color: var(--ok); }
 @keyframes fade { from { opacity: 0; } }
 @keyframes up { from { transform: translateY(40px); opacity: 0; } }
-#toast { position: fixed; left: 50%; top: calc(var(--sat) + 12px); transform: translate(-50%, -20px); background: #2f3240; color: #fff; padding: 11px 18px; border-radius: 99px; font-size: 14px; font-weight: 600; opacity: 0; pointer-events: none; transition: all .25s; z-index: 60; max-width: 90%; text-align: center; box-shadow: 0 6px 24px rgba(0,0,0,.4); }
+#toast { position: fixed; left: 50%; top: calc(var(--sat) + 12px); transform: translate(-50%, -20px); background: var(--toast-bg); color: #fff; padding: 11px 18px; border-radius: 99px; font-size: 14px; font-weight: 600; opacity: 0; pointer-events: none; transition: all .25s; z-index: 60; max-width: 90%; text-align: center; box-shadow: 0 6px 24px rgba(0,0,0,.4); }
 #toast.show { opacity: 1; transform: translate(-50%, 0); }
 textarea { min-height: 110px; font-size: 12px; font-family: ui-monospace, Menlo, monospace; }
 .kv { display: flex; justify-content: space-between; padding: 11px 0; border-top: 1px solid var(--line); }
@@ -322,3 +356,7 @@ textarea { min-height: 110px; font-size: 12px; font-family: ui-monospace, Menlo,
 .stepper button:disabled { color: var(--line); }
 .stepper span { flex: 1; text-align: center; font-weight: 700; }
 .plan-diff { font-size: 12.5px; color: var(--accent); margin: -4px 0 8px; text-align: right; }
+
+/* ---------- Tema seçimi ---------- */
+.theme-seg { margin-bottom: 0; }
+.theme-seg div.on { background: var(--accent); color: #fff; }
