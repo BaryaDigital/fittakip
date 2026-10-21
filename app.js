@@ -1311,5 +1311,18 @@ window.addEventListener('hashchange', render);
 render();
 
 if ('serviceWorker' in navigator && location.protocol !== 'file:') {
-  navigator.serviceWorker.register('sw.js').catch(() => {});
+  // Yeni sürüm devreye girince sayfayı bir kez yenile (eski dosyalarla açık kalmasın)
+  const hadController = !!navigator.serviceWorker.controller;
+  let reloaded = false;
+  navigator.serviceWorker.addEventListener('controllerchange', () => {
+    if (!hadController || reloaded) return;
+    reloaded = true;
+    location.reload();
+  });
+  navigator.serviceWorker.register('sw.js').then(reg => {
+    // Uygulama arka plandan öne gelince de güncelleme var mı bak
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') reg.update().catch(() => {});
+    });
+  }).catch(() => {});
 }

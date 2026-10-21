@@ -1,10 +1,11 @@
 // Uygulama dosyalarını önbelleğe alır, internet olmadan da çalışmasını sağlar.
 // Dosyaları güncelledikten sonra VERSION değerini artır.
-const VERSION = 'fittakip-v8';
+const VERSION = 'fittakip-v9';
 const FILES = ['./', 'index.html', 'style.css', 'app.js', 'manifest.webmanifest', 'icon-180.png', 'icon-192.png', 'icon-512.png', 'icon-maskable-192.png', 'icon-maskable-512.png'];
 
 self.addEventListener('install', e => {
-  e.waitUntil(caches.open(VERSION).then(c => c.addAll(FILES)).then(() => self.skipWaiting()));
+  // cache: 'reload' → tarayıcının HTTP önbelleğindeki eski kopyayı değil, sunucudaki yeni dosyayı al
+  e.waitUntil(caches.open(VERSION).then(c => c.addAll(FILES.map(f => new Request(f, { cache: 'reload' })))).then(() => self.skipWaiting()));
 });
 
 self.addEventListener('activate', e => {
@@ -21,7 +22,7 @@ self.addEventListener('fetch', e => {
   e.respondWith(
     caches.open(VERSION).then(cache =>
       cache.match(e.request, { ignoreSearch: true }).then(cached => {
-        const fresh = fetch(e.request)
+        const fresh = fetch(e.request, { cache: 'no-cache' })
           .then(res => { if (res.ok) cache.put(e.request, res.clone()); return res; })
           .catch(() => cached);
         return cached || fresh;
