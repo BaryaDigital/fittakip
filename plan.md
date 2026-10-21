@@ -18,7 +18,7 @@ Derleme adımı ya da kütüphane yok; düz HTML/CSS/JavaScript.
 | `index.html` | Giriş sayfası, PWA meta etiketleri |
 | `style.css` | Tüm tasarım (koyu + açık tema, mobil öncelikli) |
 | `app.js` | Uygulamanın tamamı: veri katmanı, program oluşturucu, ekranlar, olaylar |
-| `sw.js` | Service worker (çevrimdışı önbellek). **Her güncellemede `VERSION` artırılmalı.** |
+| `sw.js` | Service worker (çevrimdışı önbellek). **Her güncellemede `VERSION` artırılmalı.** Kurulumda dosyaları `cache: 'reload'` ile sunucudan alır (tarayıcı önbelleğindeki eski kopyayı değil). |
 | `FitTakip_Islevler.txt` | Tüm işlevlerin kısa, madde madde anlatımı (yeni işlevde güncellenmeli) |
 | `manifest.webmanifest` | Ana ekran uygulaması ayarları |
 | `icon-180/192/512.png` | Uygulama ikonları (iPhone ve genel) |
@@ -33,6 +33,8 @@ Derleme adımı ya da kütüphane yok; düz HTML/CSS/JavaScript.
 - `logs[]`: tamamlanan antrenmanlar `{programId, date, dayIndex, title, exercises[{exId, weight, sets, reps[], increase, link, plannedWeight, plannedSets}]}`
 - `weights[]`: vücut ağırlığı kayıtları `{date, kg}`
 - `drafts`: yarım kalan antrenman girişleri ve program oluşturma formu
+
+**Güncellemelerin telefona gelişi:** `app.js` yeni service worker devreye girince (`controllerchange`) sayfayı bir kez yeniler; uygulama öne gelince `reg.update()` ile yeni sürüm arar. Güncellemeler `localStorage`'daki veriye dokunmaz; veri yapısı değişirse `migrate()` eski kayıtları dönüştürür.
 
 **Test için tarih değiştirme:** `index.html?today=2026-10-27`
 

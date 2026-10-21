@@ -131,5 +131,12 @@ Kurulum: iPhone'da Safari > Paylaş > "Ana Ekrana Ekle". Android'de Chrome > ⋮
 
 11. GÜNCELLEMELER
 -----------------
-- Yeni sürümler otomatik gelir. Görmek için uygulamayı kapatıp açmak yeterlidir
-  (gerekirse iki kez).
+- Yeni sürümler otomatik gelir. Görmek için uygulamayı tamamen kapatıp açmak
+  yeterlidir: alttan yukarı kaydırıp açık uygulamalardan FitTakip'i yukarı atın.
+  (Ana ekrana dönmek uygulamayı kapatmaz, yalnızca arka plana alır.)
+- Yeni sürüm devreye girince uygulama kendini bir kez otomatik yeniler.
+  Arka plandan öne gelince de güncelleme olup olmadığına bakar.
+- Güncellemeler kayıtlı bilgileri (profil, programlar, geçmiş, kilo kayıtları,
+  tema seçimi) silmez. Bilgiler yalnızca şu durumlarda silinir: ana ekrandaki
+  uygulamayı silip yeniden eklemek, Safari'nin geçmiş ve site verilerini
+  temizlemek ya da Profil'deki "Tüm verileri sil".

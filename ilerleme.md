@@ -6,7 +6,7 @@
 - **Sürüm:** v9 (`sw.js` → `VERSION = 'fittakip-v9'`)
 - **Depo:** https://github.com/lByRootl/fittakip (`main` dalı)
 - **Durum:** Uygulama çalışır durumda. Planlanan tüm temel işlevler bitti (bkz. `plan.md`).
-- **Kaldığımız yer:** Uygulama GitHub Pages'te yayında (https://lbyrootl.github.io/fittakip/) ve kullanıcının telefonunda kurulu. Kullanıcı tüm özellikleri telefonda denedi ve çalışıyor. **Projeye mola verildi**; her şey GitHub'a gönderildi ve yayındaki site v7. Son eklenen: antrenman günü ağırlık ve set sayısını değiştirme, `FitTakip_Islevler.txt`'nin depoya alınması.
+- **Kaldığımız yer:** Uygulama GitHub Pages'te yayında (https://lbyrootl.github.io/fittakip/) ve kullanıcının telefonunda kurulu. Yayındaki site ve telefondaki uygulama v9. Son eklenenler: **açık tema** (Profil → Görünüm) ve güncellemelerin telefona güvenilir gelmesi için service worker düzeltmesi. Kullanıcı v9'u telefonda aldı ve açık temanın çalıştığını doğruladı.
 
 ## Sıradaki adımlar
 1. [x] Depo public yapıldı, GitHub Pages açıldı, telefona kuruldu
@@ -26,7 +26,8 @@
 ### Oturum 2 (21 Ekim 2026)
 - Kullanıcı, güncellemelerde verilerinin silinip silinmeyeceğini sordu: silinmez (veriler `localStorage`'da, güncelleme yalnızca uygulama dosyalarını değiştirir). Yalnızca Safari'de site verisini silmek ya da ana ekrandaki uygulamayı silip yeniden eklemek veriyi kaldırır.
 - Kullanıcı isteğiyle eklendi: **açık tema**. Profil → Görünüm → Koyu / Açık. Seçim `fittakip.theme` anahtarında. Sürüm v8. Ekranlar bilgisayarda (Chrome, 393 px) açık ve koyu temada kontrol edildi; iPhone'da durum çubuğu renginin değişimi henüz telefonda denenmedi.
-- Sorun: v8 telefona birkaç kez kapat-aç ile gelmedi (site yayındaydı). Sebep: service worker kurulurken dosyaları tarayıcının HTTP önbelleğinden (GitHub Pages ~10 dk) eski haliyle alabiliyordu; ayrıca yeni sürüm devreye girse de açık sayfa eski dosyalarla kalıyordu. Düzeltme (v9): kurulumda `cache: 'reload'`, arka plan tazelemede `cache: 'no-cache'`; yeni sürüm devreye girince sayfa bir kez kendini yeniliyor; uygulama öne gelince `reg.update()` ile güncelleme kontrol ediliyor. Telefonda doğrulanmadı.
+- Sorun: v8 telefona birkaç kez kapat-aç ile gelmedi (site yayındaydı). Sebep: service worker kurulurken dosyaları tarayıcının HTTP önbelleğinden (GitHub Pages ~10 dk) eski haliyle alabiliyordu; ayrıca yeni sürüm devreye girse de açık sayfa eski dosyalarla kalıyordu. Düzeltme (v9): kurulumda `cache: 'reload'`, arka plan tazelemede `cache: 'no-cache'`; yeni sürüm devreye girince sayfa bir kez kendini yeniliyor; uygulama öne gelince `reg.update()` ile güncelleme kontrol ediliyor.
+- Kullanıcı uygulamayı tamamen kapatıp açınca v9 telefona geldi; **açık tema telefonda çalışıyor** (kullanıcı doğruladı). Otomatik yenilemenin sonraki güncellemelerde tek açılışta çalışıp çalışmadığı bir sonraki sürümde görülecek. Açık temada iPhone durum çubuğunun (saat/pil) okunabilirliği ayrıca sorulmadı.
 
 ### Oturum 1, devam (20 Ekim 2026)
 - Depo public yapıldı (ücretsiz Pages için gerekli); uygulama yayında ve telefona kuruldu.
