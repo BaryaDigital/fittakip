@@ -6,7 +6,7 @@
 - **Sürüm:** v9 (`sw.js` → `VERSION = 'fittakip-v9'`)
 - **Depo:** https://github.com/lByRootl/fittakip (`main` dalı)
 - **Durum:** Uygulama çalışır durumda. Planlanan tüm temel işlevler bitti (bkz. `plan.md`).
-- **Kaldığımız yer:** Uygulama GitHub Pages'te yayında (https://lbyrootl.github.io/fittakip/) ve kullanıcının telefonunda kurulu. Yayındaki site ve telefondaki uygulama v9. Son eklenenler: **açık tema** (Profil → Görünüm) ve güncellemelerin telefona güvenilir gelmesi için service worker düzeltmesi. Kullanıcı v9'u telefonda aldı ve açık temanın çalıştığını doğruladı.
+- **Kaldığımız yer:** Uygulama GitHub Pages'te yayında (https://lbyrootl.github.io/fittakip/) ve kullanıcının telefonunda kurulu. Yayındaki site ve telefondaki uygulama v9. Son eklenenler: **açık tema** (Profil → Görünüm) ve güncellemelerin telefona güvenilir gelmesi için service worker düzeltmesi. Kullanıcı v9'u telefonda aldı ve açık temanın çalıştığını doğruladı. **Oturum 2 sonunda projeye yine mola verildi**; her şey GitHub'da.
 
 ## Sıradaki adımlar
 1. [x] Depo public yapıldı, GitHub Pages açıldı, telefona kuruldu
